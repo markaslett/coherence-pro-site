@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coherence Pro — Feedback</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; line-height: 1.6; }
+    header { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
+    .header-inner { max-width: 760px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #1d1d1f; }
+    .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #2d7dd2, #1a5fa8); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; }
+    .logo-name { font-size: 17px; font-weight: 600; }
+    nav a { text-decoration: none; color: #2d7dd2; font-size: 15px; font-weight: 500; }
+    nav a:hover { text-decoration: underline; }
+    .hero { background: linear-gradient(135deg, #1a5fa8 0%, #2d7dd2 100%); color: white; padding: 64px 24px; text-align: center; }
+    .hero h1 { font-size: 40px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 12px; }
+    .hero p { font-size: 18px; opacity: 0.85; max-width: 500px; margin: 0 auto; }
+    .content { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    .info-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .info-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+    .info-card .icon { font-size: 32px; margin-bottom: 8px; }
+    .info-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .info-card p { font-size: 14px; color: #86868b; }
+    .card { background: white; border-radius: 16px; padding: 32px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #1d1d1f; }
+    .card .subtitle { color: #86868b; font-size: 15px; margin-bottom: 28px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 15px; font-weight: 500; color: #1d1d1f; margin-bottom: 8px; }
+    .optional { font-weight: 400; color: #86868b; font-size: 13px; margin-left: 4px; }
+    textarea { width: 100%; padding: 12px 14px; border: 1.5px solid #d2d2d7; border-radius: 10px; font-size: 16px; font-family: inherit; color: #1d1d1f; background: #fafafa; transition: border-color 0.15s, box-shadow 0.15s; resize: vertical; min-height: 140px; }
+    textarea:focus { outline: none; border-color: #2d7dd2; box-shadow: 0 0 0 3px rgba(45,125,210,0.15); background: white; }
+    .type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .type-option { position: relative; }
+    .type-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .type-option label { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border: 1.5px solid #d2d2d7; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 500; color: #3a3a3c; background: #fafafa; text-align: center; transition: all 0.15s; margin-bottom: 0; }
+    .type-option label .emoji { font-size: 24px; }
+    .type-option input[type="radio"]:checked + label { border-color: #2d7dd2; background: #e8f4fd; color: #1a5fa8; box-shadow: 0 0 0 3px rgba(45,125,210,0.15); }
+    .type-option label:hover { border-color: #2d7dd2; background: white; }
+    .rating-group { display: flex; gap: 8px; }
+    .rating-option { position: relative; flex: 1; }
+    .rating-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .rating-option label { display: flex; align-items: center; justify-content: center; width: 100%; padding: 12px; border: 1.5px solid #d2d2d7; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600; color: #3a3a3c; background: #fafafa; transition: all 0.15s; margin-bottom: 0; }
+    .rating-option input[type="radio"]:checked + label { border-color: #2d7dd2; background: #2d7dd2; color: white; }
+    .rating-option label:hover { border-color: #2d7dd2; background: #e8f4fd; }
+    .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #2d7dd2, #1a5fa8); color: white; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s, transform 0.1s; }
+    .submit-btn:hover { opacity: 0.9; }
+    .submit-btn:active { transform: scale(0.99); }
+    .note { text-align: center; color: #86868b; font-size: 13px; margin-top: 12px; }
+    footer { background: #1d1d1f; color: #86868b; text-align: center; padding: 32px 24px; font-size: 14px; }
+    footer a { color: #2d7dd2; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    @media (max-width: 600px) { .hero h1 { font-size: 28px; } .card { padding: 24px; } .info-cards { grid-template-columns: 1fr; } .type-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="privacy.html">
+      <div class="logo-icon">C</div>
+      <span class="logo-name">Coherence Pro</span>
+    </a>
+    <nav><a href="privacy.html">Privacy Policy</a></nav>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Share Your Feedback</h1>
+  <p>You're helping shape Coherence Pro. Every message is read personally.</p>
+</div>
+
+<div class="content">
+
+  <div class="info-cards">
+    <div class="info-card">
+      <div class="icon">👤</div>
+      <h3>Personal Attention</h3>
+      <p>Goes directly to the developer — no support tickets, no bots</p>
+    </div>
+    <div class="info-card">
+      <div class="icon">🔒</div>
+      <h3>No Account Needed</h3>
+      <p>Opens your Mail app — nothing stored anywhere else</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Send Feedback</h2>
+    <p class="subtitle">Fill this in and tap Send — it opens Mail with everything pre-filled.</p>
+
+    <div class="form-group">
+      <label>What type of feedback?</label>
+      <div class="type-grid">
+        <div class="type-option">
+          <input type="radio" name="type" id="type-bug" value="Bug Report" checked>
+          <label for="type-bug"><span class="emoji">🐛</span>Bug Report</label>
+        </div>
+        <div class="type-option">
+          <input type="radio" name="type" id="type-feature" value="Feature Idea">
+          <label for="type-feature"><span class="emoji">💡</span>Feature Idea</label>
+        </div>
+        <div class="type-option">
+          <input type="radio" name="type" id="type-ux" value="UX Feedback">
+          <label for="type-ux"><span class="emoji">✏️</span>UX Feedback</label>
+        </div>
+        <div class="type-option">
+          <input type="radio" name="type" id="type-other" value="General">
+          <label for="type-other"><span class="emoji">💬</span>General</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="feedback">Your feedback</label>
+      <textarea id="feedback" placeholder="Tell me what you experienced, what you'd like to see, or anything on your mind..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Overall experience <span class="optional">(optional)</span></label>
+      <div class="rating-group">
+        <div class="rating-option"><input type="radio" name="rating" id="r1" value="1/5"><label for="r1">1</label></div>
+        <div class="rating-option"><input type="radio" name="rating" id="r2" value="2/5"><label for="r2">2</label></div>
+        <div class="rating-option"><input type="radio" name="rating" id="r3" value="3/5"><label for="r3">3</label></div>
+        <div class="rating-option"><input type="radio" name="rating" id="r4" value="4/5"><label for="r4">4</label></div>
+        <div class="rating-option"><input type="radio" name="rating" id="r5" value="5/5"><label for="r5">5</label></div>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="sendFeedback()">Open Mail to Send →</button>
+    <p class="note">Tapping this opens your Mail app with your feedback pre-filled.</p>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Mark Aslett · <a href="privacy.html">Privacy Policy</a> · Coherence Pro Beta</p>
+</footer>
+
+<script>
+  function sendFeedback() {
+    const type = document.querySelector('input[name="type"]:checked')?.value || 'General';
+    const feedback = document.getElementById('feedback').value.trim();
+    const rating = document.querySelector('input[name="rating"]:checked')?.value || 'Not rated';
+
+    if (!feedback) {
+      const ta = document.getElementById('feedback');
+      ta.focus();
+      ta.style.borderColor = '#ff3b30';
+      setTimeout(() => { ta.style.borderColor = '#d2d2d7'; }, 2000);
+      return;
+    }
+
+    const subject = encodeURIComponent('Coherence Pro Feedback: ' + type);
+    const body = encodeURIComponent(
+      'Type: ' + type + '\n' +
+      'Rating: ' + rating + '\n\n' +
+      'Feedback:\n' + feedback + '\n\n' +
+      '---\nSent from the Coherence Pro beta feedback page'
+    );
+
+    window.location.href = 'mailto:maslett@icloud.com?subject=' + subject + '&body=' + body;
+  }
+</script>
+
+</body>
+</html>

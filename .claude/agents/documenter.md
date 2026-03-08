@@ -77,3 +77,6 @@ in sync with reality. Nobody else does this reliably.
 - Write only to docs/brain/ directory.
 - Minimum changes — update what's stale, leave the rest.
 - Frontmatter: always set updated_by: documenter.
+- When files are renamed or moved: update all path references in brain
+  files. Check ARCHITECTURE.md module maps, TEST-MAP.md file listings,
+  and any file paths mentioned in STATUS.md or PLAN.md.

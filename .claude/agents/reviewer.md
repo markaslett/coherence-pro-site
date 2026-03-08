@@ -13,13 +13,17 @@ it ships. You check code quality, not app behavior (that's the Tester).
 
 ## Process
 
-1. Run `git diff develop...HEAD --stat` for scope
+1. Run `git diff develop...HEAD --stat` for scope (or diff of working tree if uncommitted)
 2. Run `git diff develop...HEAD` to read every changed line
 3. Read PLAN.md to understand intent
 4. Read CONVENTIONS.md for standards
 5. Read ARCHITECTURE.md for structural rules
 6. Check every changed file against the checklist
-7. Produce review report
+7. **Ripple check:** For every file that was renamed, deleted, or structurally
+   changed (new exports, changed interfaces, moved paths), grep the ENTIRE repo
+   for references to the old name/path/interface. Flag stale references as P1.
+   This includes scripts, docs, configs, and other modules — not just the diff.
+8. Produce review report
 
 ## Checklist (check every item)
 
@@ -99,7 +103,14 @@ VERDICT: [PASS / FAIL — N P0, N P1. Fix before merge.]
 ## Rules
 
 - Check EVERY changed file, not just the obvious ones.
+- The ripple check (step 7) is mandatory. Most missed bugs come from stale
+  references in files outside the diff — companion scripts, docs, configs,
+  other modules that import/reference changed files. Grep broadly.
 - Be specific: file path + line number for every finding.
 - Don't nitpick what isn't in CONVENTIONS.md.
 - P2s don't block merge — note them and move on.
 - If you find zero issues, say PASS. Don't manufacture findings.
+- When reviewing shell scripts: trace every variable from definition to all
+  usages. Dead variables and dead functions are P1 (maintenance hazard).
+- When reviewing renames/moves: verify ALL size gates, version strings, and
+  path references are consistent across the repo, not just the changed files.

@@ -76,3 +76,6 @@ For each step in the plan:
 - Convention violations: fix silently, don't ask.
 - One type per file, max 250 lines.
 - No force unwraps. Typed errors. async/await. @MainActor on ViewModels.
+- When renaming or moving files: grep the entire repo for references to
+  the old name/path BEFORE committing. Update all references in the same
+  commit. This includes scripts, docs, configs, and other modules.

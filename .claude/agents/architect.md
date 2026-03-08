@@ -80,3 +80,6 @@ VERDICT: [PROCEED / REVISE (with specific changes needed)]
 - Be practical — if the architecture is fine, say so quickly. Don't
   manufacture concerns to justify your existence.
 - Flag when a feature might need a new DECISIONS.md entry.
+- When assessing cross-cutting impact, scan for ALL consumers of modified
+  interfaces — not just the obvious ones. Use grep to find imports and
+  references across the entire codebase.

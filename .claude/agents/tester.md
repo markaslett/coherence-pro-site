@@ -123,3 +123,6 @@ Write results to docs/brain/TEST-SUMMARY.md and update docs/brain/TESTS.md.
   Never pause. Log failures and continue.
 - If build fails: stop, report. Don't test a broken build.
 - Screenshots saved to docs/brain/screenshots/[date]/.
+- For non-app repos (kit, scripts): adapt the process. Test means verifying
+  scripts run without error, configs parse correctly, and file references
+  resolve. Skip simulator configs. Report as diff-based review.

@@ -94,7 +94,7 @@ guidance. Format as D[N] ready for DECISIONS.md.]
 ## Rules
 
 - Every step must map to exactly one file.
-- Reference existing files by exact path.
+- Reference existing files by exact path — verify paths exist with glob/grep.
 - Include reuse opportunities — don't plan to build what exists.
 - If the Architect flagged concerns, address each one in the plan.
 - A good plan means the Developer builds the right thing the first time.
@@ -103,3 +103,6 @@ guidance. Format as D[N] ready for DECISIONS.md.]
   Never bury decisions in paragraphs of technical text. Mark is a product
   owner, not a developer reading a code review. Present choices clearly
   with your recommendation as the default.
+- For renames or restructuring: list ALL files that reference the old
+  names/paths in the Files table. The Developer needs to know every
+  touchpoint, not just the primary files.

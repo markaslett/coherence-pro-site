@@ -48,11 +48,59 @@ in sync with reality. Nobody else does this reliably.
 - docs/brain/PLAN.md (what was built)
 - Source code (to verify docs match reality)
 
-## Output
+## Output Format
 
-- Updated brain files in docs/brain/
-- YAML frontmatter updated with `updated_by: documenter`
-- Discrepancies flagged in STATUS.md NEEDS ATTENTION
+Print to stdout when work is complete. Fill in every field.
+
+```
+=== DOCUMENTATION REPORT ===
+Trigger: [/save auto-invoke / manual request / staleness check]
+Files in session diff: [N]
+
+UPDATED:
+  [file] — [what changed, one line]
+  [file] — [what changed, one line]
+
+NOT UPDATED:
+  [file] — [why: "already current" / "not affected by this session"]
+
+DISCREPANCIES FOUND:
+  - [brain file] says [X] but codebase shows [Y] — [flagged in STATUS.md / resolved]
+  [or: None]
+
+FRONTMATTER:
+  All updated files: last_updated set, updated_by: documenter
+=============================
+```
+
+**Example with realistic data:**
+
+```
+=== DOCUMENTATION REPORT ===
+Trigger: /save auto-invoke
+Files in session diff: 8
+
+UPDATED:
+  ARCHITECTURE.md — added Features/Breathing module, HapticService dependency
+  TEST-MAP.md — added BreathingView.swift -> Breathing screen mapping
+  STATUS.md — updated current task, phase 3 progress
+  PLAN.md — checked off steps 1-4 as complete
+
+NOT UPDATED:
+  CONVENTIONS.md — already current, no new UI patterns established
+  TESTS.md — not affected (Tester updates this directly)
+
+DISCREPANCIES FOUND:
+  - ARCHITECTURE.md listed 12 feature modules but codebase has 13 — resolved (added Breathing)
+
+FRONTMATTER:
+  All updated files: last_updated set, updated_by: documenter
+=============================
+```
+
+**Required fields:** Trigger, Files in session diff, UPDATED, NOT UPDATED, FRONTMATTER.
+**Optional fields:** DISCREPANCIES FOUND (omit if none).
+**Discrepancy rule:** Unresolvable discrepancies go to STATUS.md NEEDS ATTENTION section.
 
 ## Boundaries — What You Must NOT Do
 
@@ -80,3 +128,4 @@ in sync with reality. Nobody else does this reliably.
 - When files are renamed or moved: update all path references in brain
   files. Check ARCHITECTURE.md module maps, TEST-MAP.md file listings,
   and any file paths mentioned in STATUS.md or PLAN.md.
+- For discrepancies you cannot resolve, load communication.md and use the Escalation format.

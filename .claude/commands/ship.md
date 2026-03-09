@@ -19,22 +19,30 @@ If any hard block: stop. Print what failed. Do not proceed.
 
 ## Step 2: Read current build number
 
-Run: `agvtool what-version -terse` to get current build number.
-If agvtool is not configured: fall back to reading from the .xcodeproj:
-`grep -r 'CURRENT_PROJECT_VERSION' *.xcodeproj/project.pbxproj | head -1`
-
-Store: CURRENT_BUILD, NEW_BUILD = CURRENT_BUILD + 1.
-
+### Primary (dev-tools available)
+Run: `bash ~/projects/dev-tools/kit/build-bump.sh --check --json`
+Read JSON: old_build, new_build (preview only — not bumped yet).
 Read marketing version: `agvtool what-marketing-version -terse1`
 If that fails: `grep -r 'MARKETING_VERSION' *.xcodeproj/project.pbxproj | head -1`
+Store: CURRENT_BUILD = old_build, NEW_BUILD = new_build, VERSION.
 
+### Fallback
+Run: `agvtool what-version -terse` to get current build number.
+If agvtool not configured: `grep -r 'CURRENT_PROJECT_VERSION' *.xcodeproj/project.pbxproj | head -1`
+Store: CURRENT_BUILD, NEW_BUILD = CURRENT_BUILD + 1.
+Read marketing version: `agvtool what-marketing-version -terse1`
+If that fails: `grep -r 'MARKETING_VERSION' *.xcodeproj/project.pbxproj | head -1`
 Store: VERSION.
 
 ## Step 3: Bump build number
 
+### Primary (dev-tools available)
+Run: `bash ~/projects/dev-tools/kit/build-bump.sh --json`
+Read JSON: old_build, new_build, bumped. Verify bumped == true.
+
+### Fallback
 Run: `agvtool new-version -all $NEW_BUILD`
 If agvtool not configured: update CURRENT_PROJECT_VERSION in project.pbxproj directly.
-
 Verify: `agvtool what-version -terse` returns NEW_BUILD.
 
 ## Step 4: Generate "What to Test" summary

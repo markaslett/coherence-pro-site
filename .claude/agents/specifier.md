@@ -22,50 +22,61 @@ can build without ambiguity.
 6. Scan the feature area in the codebase
 7. Write PLAN.md
 
-## Output: PLAN.md
+## Output Format
 
-Write to docs/brain/PLAN.md:
+Write to docs/brain/PLAN.md. Use this exact structure:
 
 ```markdown
 ---
 type: plan
-created: [timestamp]
-feature: [name]
+created: [YYYY-MM-DDTHH:MM:SSZ]
+feature: [feature name]
 estimated_files: [count]
 status: active
 spec_by: specifier
 ---
 
 ## Goal
-[One paragraph: what Mark wants, in plain English]
+[One paragraph: what Mark wants, in plain English. No jargon.]
 
 ## Design Decisions
-[Decisions that must be made before coding. Reference any Architect
-guidance. Format as D[N] ready for DECISIONS.md.]
+D[N]: [question — what needs deciding before coding]
+  Options: [A: ..., B: ...]
+  Recommend: [option] — [rationale]
+  Status: [PENDING / APPROVED by Mark]
 
 ## Implementation Steps
-- [ ] Step 1: [description] — [exact file path]
-- [ ] Step 2: [description] — [exact file path]
+- [ ] Step 1: [description] — `[exact/file/path.swift]`
+- [ ] Step 2: [description] — `[exact/file/path.swift]`
 
 ## Files
 | File | Action | Why |
 |------|--------|-----|
-| path/to/File.swift | new | description |
-| path/to/Other.swift | modify | description |
+| exact/path/File.swift | new | [one-sentence reason] |
+| exact/path/Other.swift | modify | [one-sentence reason] |
 
 ## Reuse
-[Components from Shared/Components/ that apply, with modifications needed]
+| Component | Location | Modification Needed |
+|-----------|----------|-------------------|
+| [name] | Shared/Components/[file] | [what to change, or "none"] |
 
 ## Verification Criteria
-- [ ] Builds clean
-- [ ] All 4 test configs pass
-- [ ] Light + dark mode verified
-- [ ] Accessibility labels on all interactive elements
-- [ ] [Feature-specific checks]
+- [ ] Builds clean on both simulators
+- [ ] All 4 test configs pass (16-L, 16-D, 17PM-L, 17PM-D)
+- [ ] Light + dark mode screenshots taken
+- [ ] .accessibilityLabel() on all interactive elements
+- [ ] [Feature-specific check 1]
+- [ ] [Feature-specific check 2]
 
 ## Risks
-[What could go wrong. What needs Mark's input.]
+- [What could go wrong — one per line]
+- [What needs Mark's input before proceeding]
 ```
+
+**Required sections:** All sections are required. Use "None" for empty Reuse or Risks.
+**Step rule:** Every step maps to exactly one file. Multi-file steps must be split.
+**File rule:** Every file in Implementation Steps must appear in the Files table.
+**Decision rule:** For decisions needing Mark's input, use the Decision Request format from communication.md.
 
 ## Inputs
 
@@ -98,11 +109,7 @@ guidance. Format as D[N] ready for DECISIONS.md.]
 - Include reuse opportunities — don't plan to build what exists.
 - If the Architect flagged concerns, address each one in the plan.
 - A good plan means the Developer builds the right thing the first time.
-- When the plan includes decisions that need Mark's approval, present them
-  using the DECISION REQUEST template — options, tradeoffs, recommendation.
-  Never bury decisions in paragraphs of technical text. Mark is a product
-  owner, not a developer reading a code review. Present choices clearly
-  with your recommendation as the default.
+- For decisions needing Mark's approval, load communication.md and use the Decision Request format.
 - For renames or restructuring: list ALL files that reference the old
   names/paths in the Files table. The Developer needs to know every
   touchpoint, not just the primary files.

@@ -58,30 +58,70 @@ Same as smart, but ALL screens, ALL configs, plus:
 
 ## Output Format
 
+Print to stdout AND write to docs/brain/TEST-SUMMARY.md. Fill in every field.
+
 ```
 === TEST REPORT ===
 Run: [/test or /test-full]
-Date: [timestamp]
-Screens tested: [N] ([list])
-Configs: [list]
+Date: [YYYY-MM-DD HH:MM]
+Screens tested: [N] ([comma-separated list])
+Configs: [comma-separated list of configs tested]
 
 RESULTS:
-  [PASS/FAIL] [Screen] — [config]: [detail]
+  [PASS] [Screen] — [config]: all checks passed
     Screenshot: [path]
-    Severity: [P0/P1/P2]
+  [FAIL] [Screen] — [config]: [what failed]
+    Screenshot: [path]
+    Severity: [P0 / P1 / P2]
     Filed: #[issue number]
 
 ACCESSIBILITY:
-  [PASS/WARN] [detail]
+  [PASS] [detail]
+  [WARN] [detail — what could be improved]
+  [FAIL] [detail — missing label or broken VoiceOver]
 
 REGRESSION:
-  [None / list regressions from previous run]
+  [None / list of regressions vs. previous run in TESTS.md]
 
-RESULT: [ALL PASS / NEEDS ATTENTION (N findings)]
+SUMMARY: [N] screens, [N] configs, [N] passed, [N] failed
+RESULT: [ALL PASS / NEEDS ATTENTION — N P0, N P1, N P2]
 =============================
 ```
 
-Write results to docs/brain/TEST-SUMMARY.md and update docs/brain/TESTS.md.
+**Example with realistic data:**
+
+```
+=== TEST REPORT ===
+Run: /test (smart)
+Date: 2026-03-04 14:30
+Screens tested: 4 (Home, Breathing, BreathingDetail, Settings)
+Configs: 16-L, 16-D, 17PM-L, 17PM-D
+
+RESULTS:
+  [PASS] Home — all 4 configs
+  [PASS] Breathing — all 4 configs
+  [FAIL] BreathingDetail — 17PM-D: timer text clipped at bottom
+    Screenshot: screenshots/2026-03-04/breathing-detail-17pm-d.png
+    Severity: P1
+    Filed: #147
+  [PASS] Settings — all 4 configs
+
+ACCESSIBILITY:
+  [PASS] All interactive elements have .accessibilityLabel
+  [WARN] BreathingDetail "Start" button — label could be more descriptive
+
+REGRESSION:
+  None (compared to 2026-03-03 run)
+
+SUMMARY: 4 screens, 4 configs, 15 passed, 1 failed
+RESULT: NEEDS ATTENTION — 0 P0, 1 P1, 0 P2
+=============================
+```
+
+**Required fields:** All fields required. No omissions.
+**Screenshot rule:** Every PASS and FAIL entry must have a screenshot path.
+**Filing rule:** Every P0 and P1 must be filed as a GitHub issue with screenshot, config, steps.
+**Also update:** docs/brain/TESTS.md with run entry appended to history.
 
 ## Severity
 
@@ -126,3 +166,4 @@ Write results to docs/brain/TEST-SUMMARY.md and update docs/brain/TESTS.md.
 - For non-app repos (kit, scripts): adapt the process. Test means verifying
   scripts run without error, configs parse correctly, and file references
   resolve. Skip simulator configs. Report as diff-based review.
+- For issues outside your scope, load communication.md and use the Escalation format.

@@ -40,13 +40,76 @@ For each step in the plan:
 - Architect assessment (if produced)
 - Specific bug report or feature request
 
-## Output
+## Output Format
 
-- Code committed to feature branch
-- Build passes
-- Basic smoke screenshots (before/after, light/dark)
-- Checked-off steps in PLAN.md
-- Any issues encountered noted in commit messages
+Print to stdout when work is complete. Fill in every field.
+
+```
+=== BUILD REPORT ===
+Branch: [feature/branch-name]
+Plan: [PLAN.md feature name, or "no plan (solo task)"]
+
+COMPLETED:
+  - [x] Step N: [description] — `[file path]`
+  - [x] Step N: [description] — `[file path]`
+  - [ ] Step N: [SKIPPED — reason] — `[file path]`
+
+FILES CHANGED:
+  [N] new, [N] modified, [N] deleted
+
+BUILD: [PASS / FAIL — error summary]
+
+SCREENSHOTS:
+  [path/to/screenshot-1.png] — [screen, config, theme]
+  [path/to/screenshot-2.png] — [screen, config, theme]
+  [or: No View changes — screenshots not applicable]
+
+COMMITS:
+  [hash] [commit message]
+  [hash] [commit message]
+
+ISSUES ENCOUNTERED:
+  - [description — noted in commit [hash]]
+  [or: None]
+=============================
+```
+
+**Example with realistic data:**
+
+```
+=== BUILD REPORT ===
+Branch: feature/breathing-timer
+Plan: Breathing Timer
+
+COMPLETED:
+  - [x] Step 1: Create BreathingSession model — `Shared/Models/BreathingSession.swift`
+  - [x] Step 2: Create HapticService — `Shared/Services/HapticService.swift`
+  - [x] Step 3: Create BreathingViewModel — `Features/Breathing/BreathingViewModel.swift`
+  - [x] Step 4: Create BreathingView — `Features/Breathing/BreathingView.swift`
+
+FILES CHANGED:
+  4 new, 1 modified, 0 deleted
+
+BUILD: PASS
+
+SCREENSHOTS:
+  screenshots/breathing-16-light.png — BreathingView, 16-L, light
+  screenshots/breathing-16-dark.png — BreathingView, 16-D, dark
+  screenshots/breathing-17pm-light.png — BreathingView, 17PM-L, light
+  screenshots/breathing-17pm-dark.png — BreathingView, 17PM-D, dark
+
+COMMITS:
+  a1b2c3d feat(breathing): add BreathingSession model
+  e4f5g6h feat(breathing): add HapticService with environment injection
+  i7j8k9l feat(breathing): add BreathingView and ViewModel
+
+ISSUES ENCOUNTERED:
+  - CircularProgress.swift needed onComplete callback — noted in commit e4f5g6h
+=============================
+```
+
+**Required fields:** Branch, Plan, COMPLETED, FILES CHANGED, BUILD, COMMITS.
+**Optional fields:** SCREENSHOTS (required if any View was touched), ISSUES ENCOUNTERED (omit if none).
 
 ## Boundaries — What You Must NOT Do
 
@@ -79,3 +142,4 @@ For each step in the plan:
 - When renaming or moving files: grep the entire repo for references to
   the old name/path BEFORE committing. Update all references in the same
   commit. This includes scripts, docs, configs, and other modules.
+- For issues outside your scope, load communication.md and use the Escalation format.

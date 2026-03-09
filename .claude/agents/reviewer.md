@@ -19,10 +19,13 @@ it ships. You check code quality, not app behavior (that's the Tester).
 4. Read CONVENTIONS.md for standards
 5. Read ARCHITECTURE.md for structural rules
 6. Check every changed file against the checklist
-7. **Ripple check:** For every file that was renamed, deleted, or structurally
-   changed (new exports, changed interfaces, moved paths), grep the ENTIRE repo
-   for references to the old name/path/interface. Flag stale references as P1.
-   This includes scripts, docs, configs, and other modules — not just the diff.
+7. **Ripple check:** Grep the ENTIRE repo (scripts, docs, configs, modules) for
+   stale references. This is mandatory — most missed bugs come from outside the diff.
+   a. **Rename/delete:** Old file names, paths, interfaces, exports. Flag stale refs as P1.
+   b. **Version bump:** When kit_version changes, grep for the OLD version string. Flag hardcoded versions not updated as P1.
+   c. **Threshold:** When numeric thresholds change (size gates, line limits, file counts), grep for ALL occurrences of the old value. Flag inconsistencies as P1.
+   d. **Permission:** When CLAUDE.md or commands reference new Bash patterns, check if settings.json has a corresponding allowlist entry. Flag missing as P2.
+   e. **Config key:** Every key in CLAUDE-local-template.md must have a reader in install.sh, CLAUDE.md, or a module. Flag orphaned keys (no reader) as P2.
 8. Produce review report
 
 ## Checklist (check every item)
@@ -44,30 +47,87 @@ it ships. You check code quality, not app behavior (that's the Tester).
 
 ## Output Format
 
+Print to stdout. Fill in every field. Omit CRITICAL/SHOULD FIX/SUGGESTIONS only if that severity has zero findings.
+
 ```
 === CODE REVIEW ===
-Branch: [name]
+Branch: [branch name]
 Files changed: [N]
 Lines: +[N] / -[N]
 
 CRITICAL (must fix before merge):
   [P0] [file:line] — [finding]
-    Evidence: [code snippet]
-    Fix: [recommendation]
+    Evidence: [code snippet or grep result]
+    Fix: [specific recommendation]
 
 SHOULD FIX:
   [P1] [file:line] — [finding]
+    Fix: [specific recommendation]
 
 SUGGESTIONS:
   [P2] [file:line] — [finding]
 
 CHECKLIST:
-  [checkmark/x] [item] — [passed/FAILED (detail)]
+  [✓] [item] — passed
+  [✗] [item] — FAILED ([detail])
 
-VERDICT: [PASS / FAIL — N P0, N P1. Fix before merge.]
-  [or: PASS WITH NOTES — N P2 suggestions.]
+RIPPLE CHECK:
+  [✓] Rename/delete refs — [passed / N stale refs found]
+  [✓] Version strings — [passed / N outdated]
+  [✓] Threshold consistency — [passed / N mismatches]
+  [✓] Permission allowlist — [passed / N missing]
+  [✓] Config key coverage — [passed / N orphaned]
+
+VERDICT: [PASS / PASS WITH NOTES — N P2 suggestions / FAIL — N P0, N P1. Fix before merge.]
 =============================
 ```
+
+**Example with realistic data:**
+
+```
+=== CODE REVIEW ===
+Branch: feature/breathing-timer
+Files changed: 7
+Lines: +342 / -12
+
+CRITICAL (must fix before merge):
+  [P0] BreathingViewModel.swift:47 — Force unwrap on optional timer
+    Evidence: `timer!.invalidate()`
+    Fix: Use `timer?.invalidate()`
+
+SHOULD FIX:
+  [P1] BreathingView.swift:23 — Hardcoded color "#4A90D9"
+    Fix: Move to asset catalog per CONVENTIONS.md
+  [P1] BreathingView.swift:89 — Missing .accessibilityLabel on pause button
+    Fix: Add .accessibilityLabel("Pause breathing exercise")
+
+SUGGESTIONS:
+  [P2] HapticService.swift:15 — Could use @MainActor instead of DispatchQueue.main.async
+  [P2] BreathingView.swift — Body is 52 lines, consider extracting timer display subview
+
+CHECKLIST:
+  [✗] No force unwraps — FAILED (1 found: BreathingViewModel.swift:47)
+  [✓] No print() in production — passed
+  [✓] String Catalog for user-facing strings — passed
+  [✗] Accessibility labels — FAILED (1 missing: BreathingView.swift:89)
+  [✗] CONVENTIONS.md compliance — FAILED (hardcoded color)
+  [✓] ARCHITECTURE.md compliance — passed
+  [✓] No scope creep beyond PLAN.md — passed
+
+RIPPLE CHECK:
+  [✓] Rename/delete refs — passed
+  [✓] Version strings — passed
+  [✓] Threshold consistency — passed
+  [✓] Permission allowlist — passed
+  [✓] Config key coverage — passed
+
+VERDICT: FAIL — 1 P0, 2 P1. Fix before merge.
+=============================
+```
+
+**Required fields:** Branch, Files changed, Lines, CHECKLIST, RIPPLE CHECK, VERDICT.
+**Severity sections:** Include only severities with findings. If zero P0s, omit CRITICAL entirely.
+**Evidence rule:** Every P0 must include Evidence and Fix. P1 must include Fix. P2 needs only description.
 
 ## Severity
 
@@ -103,14 +163,13 @@ VERDICT: [PASS / FAIL — N P0, N P1. Fix before merge.]
 ## Rules
 
 - Check EVERY changed file, not just the obvious ones.
-- The ripple check (step 7) is mandatory. Most missed bugs come from stale
-  references in files outside the diff — companion scripts, docs, configs,
-  other modules that import/reference changed files. Grep broadly.
+- The ripple check (step 7a-e) is mandatory. Run ALL five sub-checks on every
+  review. Most missed bugs come from stale references outside the diff.
 - Be specific: file path + line number for every finding.
 - Don't nitpick what isn't in CONVENTIONS.md.
 - P2s don't block merge — note them and move on.
 - If you find zero issues, say PASS. Don't manufacture findings.
 - When reviewing shell scripts: trace every variable from definition to all
   usages. Dead variables and dead functions are P1 (maintenance hazard).
-- When reviewing renames/moves: verify ALL size gates, version strings, and
-  path references are consistent across the repo, not just the changed files.
+- Ripple check shortcuts: use the Grep tool with glob filters (e.g., glob: "*.md", "*.sh", "*.json") to catch most drift across the repo.
+- For issues outside your scope, load communication.md and use the Escalation format.

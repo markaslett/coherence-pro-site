@@ -24,27 +24,64 @@ what breaks at scale and your job is to prevent it.
 
 ## Output Format
 
-Print a structured ARCHITECTURE REVIEW to stdout:
+Print to stdout. Fill in every field. Omit sections only if empty.
 
 ```
 === ARCHITECTURE REVIEW ===
-Feature: [name]
-Modules affected: [list]
+Feature: [feature name from Manager's request]
+Modules affected: [comma-separated list]
 Risk: [LOW / MEDIUM / HIGH]
 
 STRUCTURE:
-  [Proposed new files, modified files, reuse opportunities]
+  New: [new files/modules to create, one per line with indent]
+  Modify: [existing files to change, one per line with indent]
+  Reuse: [components from Shared/Components/ to leverage]
 
 DECISIONS NEEDED:
-  D[N]: [question]
-    Recommend: [option with rationale]
+  D[N]: [question — what needs deciding]
+    Options: [A: ..., B: ...]
+    Recommend: [option] — [one-sentence rationale]
 
 CONCERNS:
-  [Cross-cutting impacts, shared component modifications, data flow changes]
+  - [cross-cutting impact, shared component risk, data flow change]
 
-VERDICT: [PROCEED / REVISE (with specific changes needed)]
+VERDICT: [PROCEED / PROCEED WITH NOTED DECISIONS / REVISE — specific changes needed]
 =============================
 ```
+
+**Example with realistic data:**
+
+```
+=== ARCHITECTURE REVIEW ===
+Feature: Breathing Timer
+Modules affected: Features/Breathing (new), Shared/Components, Shared/Services
+Risk: LOW
+
+STRUCTURE:
+  New: Features/Breathing/ — View, ViewModel, Repository
+  New: Shared/Services/HapticService.swift
+  New: Shared/Models/BreathingSession.swift
+  Modify: Shared/Components/CircularProgress.swift — add completion callback
+  Reuse: CircularProgress from Shared/Components/
+
+DECISIONS NEEDED:
+  D12: HapticService — singleton service vs. environment injection?
+    Options: A: Singleton, B: Environment injection
+    Recommend: B — consistent with existing service pattern
+  D13: Session persistence — SwiftData or UserDefaults?
+    Options: A: SwiftData, B: UserDefaults
+    Recommend: A — consistent with other features, enables history
+
+CONCERNS:
+  - CircularProgress needs a completion callback for haptic timing.
+    Modifying shared component — check all current usages first.
+
+VERDICT: PROCEED WITH NOTED DECISIONS
+=============================
+```
+
+**Required fields:** Feature, Modules affected, Risk, STRUCTURE, VERDICT.
+**Optional fields:** DECISIONS NEEDED (omit if none), CONCERNS (omit if none).
 
 ## Inputs
 
@@ -83,3 +120,4 @@ VERDICT: [PROCEED / REVISE (with specific changes needed)]
 - When assessing cross-cutting impact, scan for ALL consumers of modified
   interfaces — not just the obvious ones. Use grep to find imports and
   references across the entire codebase.
+- For decisions needing Mark's input, load communication.md and use the Decision Request format.

@@ -1,3 +1,15 @@
-Pull TestFlight feedback. Run TESTFLIGHT_SYNC_SCRIPT from CLAUDE-local.md.
-Report new items. Suggest /feedback to process into GitHub issues.
-If TESTFLIGHT_SYNC_SCRIPT not defined: "TestFlight sync not configured."
+Pull TestFlight feedback into FEEDBACK.md for processing.
+
+## Primary (dev-tools available)
+
+Run: `bash ~/projects/dev-tools/testflight-sync/sync-testflight-feedback.sh --dry-run`
+Review dry-run output. If new feedback found:
+Run: `bash ~/projects/dev-tools/testflight-sync/sync-testflight-feedback.sh`
+Report new items pulled.
+Suggest: "Run /feedback to process into GitHub issues."
+
+## Fallback (dev-tools missing)
+
+If TESTFLIGHT_SYNC_SCRIPT is set in CLAUDE-local.md: run that script instead.
+If TESTFLIGHT_SYNC_SCRIPT not defined: "TestFlight sync not configured.
+Set TESTFLIGHT_SYNC_SCRIPT in CLAUDE-local.md or install dev-tools."

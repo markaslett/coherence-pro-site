@@ -1,6 +1,18 @@
 Spec compliance audit. Verify code implements what the planning spec says.
 When docs/planning/*.md exists: spec compliance mode.
-No specs: fall back to /health (codebase health check).
+No specs: change mode (branch diff audit). No specs AND no changes: fall back to /health.
+
+## Preamble: Data Gathering (dev-tools available)
+
+Run: `bash ~/projects/dev-tools/gates/audit-check.sh --json`
+Read JSON: mode (spec/change), spec_files, requirements_found, files_in_diff,
+file_to_module_map, test_coverage_map, doc_coverage_map.
+
+- If mode == "change": skip to Change Mode section below.
+- Pass file_to_module_map to Architect in Phase 2 (saves scanning).
+- Pass test_coverage_map to Tester in Phase 2.
+- Pass doc_coverage_map to Documenter in Phase 2.
+- Dev-tools missing: warn, proceed — agents do their own scanning (existing behavior).
 
 Load the agents module: cat ~/projects/claude-dev-kit/modules/agents.md
 State "Loaded: agents.md — running /audit."
@@ -132,9 +144,15 @@ If any agent is unavailable, Manager handles that agent's phase solo.
 All four phases still run — the work doesn't get skipped, only the delegation.
 State which agents were dispatched and which Manager handled in the output header.
 
-## Fallback: Codebase Health Check (no specs)
+## Change Mode (no specs)
 
-If docs/planning/ is empty or missing, run /health instead:
+If audit-check.sh returned mode == "change" (or no specs found manually):
+Run branch diff audit for test coverage, documentation gaps, regression risk,
+and spec gaps (warning, not blocker). Manager runs solo or with Reviewer for 10+ file diffs.
+
+## Fallback (no specs AND no dev-tools)
+
+If docs/planning/ is empty or missing and dev-tools unavailable, run /health instead:
 codebase health check via Architect. See commands/health.md.
 
 ## Rules

@@ -1,5 +1,5 @@
-# CLAUDE.md v12.0 -- Development Operating System
-<!-- kit_version: 12.0 -->
+# CLAUDE.md v13.0 -- Development Operating System
+<!-- kit_version: 13.0 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -112,29 +112,21 @@ Smart mode: last commit <4h AND clean tree AND same branch -> skip to step 8.
 State: "Quick start (last commit <4h, clean, same branch)."
 
 Full mode:
-1. Detect interface: FULL / LIMITED / MOBILE.
-2. Session type: first message /test-full = OVERNIGHT, else CODING.
-2.5. Project repo: git remote get-url origin -> owner/repo. PROJECT for /issues, /triage, /status. KIT_REPO for KitImprovement only. Show "PROJECT: [name] | REPO: [owner/repo]".
-3. Check SESSION-LOCK.md per rules above.
-3.5. Read SESSION HANDOFF from STATUS.md: surface START HERE at top, WAITING FOR MARK and DO NOT FORGET under NEEDS ATTENTION. Clear after reading.
-4. Read brain files (Section 1). STATUS.md first. Frontmatter staleness "never" + >14 days: flag STALE.
-5. Read CLAUDE-local.md. Validate: script paths exist+executable, config keys present, AGENTS key (default: all). Missing: warn, continue.
-5.5. Kit auto-sync: if this project IS the kit repo, skip. Otherwise: (a) if ~/projects/claude-dev-kit exists and has no uncommitted changes, run cd ~/projects/claude-dev-kit && git pull --ff-only. If pull fails (offline or diverged): warn "Kit repo pull failed — running on local version. Fix: cd ~/projects/claude-dev-kit && git pull". If uncommitted changes: skip pull, warn "Kit repo has local edits — skipping auto-sync." (b) Compare kit_version in this project's CLAUDE.md against ~/projects/claude-dev-kit/CLAUDE.md. If kit repo has a newer version: run bash ~/projects/claude-dev-kit/install.sh [this-project-path]. Report "Kit updated: vOLD -> vNEW. Run /compact to pick up new instructions." If versions match or kit repo unreachable: skip silently. (#93, #95, #96)
-6. Validate modules (~/projects/claude-dev-kit/modules/*.md) and agents (.claude/agents/*.md). Use bash -c. Missing: warn, fall back, KitImprovement.
-7. Check STACK.md. Surface watch items. >90 days: "Stack review overdue."
-8. Sync GitHub issues to ISSUES.md (PROJECT repo). Fetch open, ensure labels, reconcile counts. last_issue in STATUS.md: "Resume #N?" GitHub unreachable: warn, continue.
-9. TestFlight sync: if TESTFLIGHT_SYNC_SCRIPT is set (uncommented) in CLAUDE-local.md, run it. Script missing or not executable: warn, continue. Script fails: warn with exit code, continue. Key commented out or absent: skip silently. (#75)
-9.5. XcodeBuildMCP defaults: if BUNDLE_ID and SIMULATOR_MAIN_16 are set in CLAUDE-local.md and XcodeBuildMCP MCP server is available (/mcp), invoke the XcodeBuildMCP MCP tool to set session defaults with bundleId from BUNDLE_ID and simulatorId resolved from SIMULATOR_MAIN_16 device name (xcrun simctl list devices available | grep '<device-name>' | extract UUID). Device not found: warn, skip. Missing keys or no XcodeBuildMCP: skip silently. Also resolve SIMULATOR_MAIN_WATCH if set — same UUID lookup for watchOS simulator. Store both iPhone and Watch simulator IDs for the session. (#76, #91)
-10. Proactive scan: files >250 lines, stale TODOs (>5 sessions), print() in production, test gaps, missing .accessibilityLabel (P1), brain rotation, worktree audit. Bash: relative paths, | xargs not -exec.
-11. Auto-run /status. /begin output IS /status output. OVERNIGHT: append "OVERNIGHT MODE active."
+1. Run: bash ~/projects/dev-tools/session/preflight.sh --json
+2. Read JSON output. If lock "locked" (<24h): warn+stop. If "stale": auto-clear via lock.sh release.
+3. Acquire lock: bash ~/projects/dev-tools/session/lock.sh acquire
+4. If kit.update_available: run install.sh, tell Mark to /compact.
+5. Surface handoff (start_here at top, waiting + do_not_forget under NEEDS ATTENTION).
+6. Read brain files: STATUS.md first, then by task context.
+7. Assess: P0s? Stale brain files? Overnight test failures?
+8. Present /status format. One recommendation. Specific, not generic.
+
+Dev-tools missing: fall back to manual steps in commands/begin.md.
 
 ### /status -- Live Snapshot
 
-Reads: STATUS.md, ISSUES.md, TESTS.md, PLAN.md, FEEDBACK.md (full if <200 words, count if over), CLAUDE.md version.
-Git: status, branch, log -5, commits behind, /mcp check.
-Shell: Never $() inside Bash. Run separately, capture, pass as literals.
-Bash: Relative paths. | xargs not -exec {} \;.
-
+Run: bash ~/projects/dev-tools/session/status.sh --json (or --compact for LIMITED/MOBILE).
+Dev-tools missing: read STATUS.md, ISSUES.md, TESTS.md, PLAN.md, FEEDBACK.md, CLAUDE.md version, git state manually.
 FULL: PROJECT, REPO, PHASE, BRANCH, INTERFACE, CREW, NEEDS ATTENTION, ISSUES, FEEDBACK, TESTS, LAST SESSION, ACTIVE PLAN, STACK, KIT, RECOMMENDED.
 COMPACT (LIMITED/MOBILE): Project | phase | branch | crew | critical | issues | next.
 P0/P1/Questions/TestFailures/Worktrees/Stale brain: NEEDS ATTENTION.
@@ -147,24 +139,26 @@ First step of /save. Also on demand. Shows: FEATURES, ISSUES CLOSED, DECISIONS, 
 ### /save -- End Session
 
 1. /summary. 2. Gates: reconciliation [!], FEEDBACK, P0. 3. Screenshots.
-3.5. Pre-save: DECISIONS.md audit, SESSION HANDOFF (START HERE, WAITING FOR MARK, DO NOT FORGET, CREW ACTIVITY), pre-save hook (Documenter on 5+ files).
-4. Convention/architecture check. 5. Worktree cleanup. 6. Commit, push.
-6.5. Issue auto-close: scan session commits for issue references (#NNN). For each
-referenced issue fixed this session, close on GitHub via MCP with 2-sentence summary.
-Use commit context to write the close message. Update ISSUES.md cache. Report: "Closed: #N, #N."
+3.5. Pre-save: DECISIONS.md audit, SESSION HANDOFF (via handoff.sh or manual), pre-save hook (Documenter on 5+ files).
+4. Convention/architecture check. 5. Worktree cleanup.
+6. Commit+push via checkpoint.sh (or manual git). Issue auto-close. Lock release.
 7. "Saved. [N] files. [hash]. Lock released."
+
+Dev-tools missing: fall back to manual steps in commands/save.md.
 
 ### /snap -- Mid-Session
 
-Scope to changed files. Update brain files touched by session diff.
+Run: bash ~/projects/dev-tools/session/checkpoint.sh --json (no --commit).
+Dev-tools missing: scope to changed files, update brain files touched by session diff manually.
 Skip screenshots if no View files in git diff. No commit.
 Auto-snap: after feature/fix, before /test, before branch switch.
 50%: silent. 70%: notify. 85%: warn to finish then /compact or /clear.
 
 ### /recover -- Emergency
 
-Write state to STATUS.md. /snap all brain files. Try /compact.
-If not enough: "Context critical. /clear then /begin." Stop.
+Run: bash ~/projects/dev-tools/session/recover.sh --json
+Dev-tools missing: write state to STATUS.md, /snap all brain files manually.
+Try /compact. If not enough: "Context critical. /clear then /begin." Stop.
 
 ### Autosave and Self-Audit
 
@@ -205,6 +199,26 @@ When docs/planning/ is empty or missing, /audit runs change mode — audits the 
 diff against the base branch for: test coverage, documentation gaps, regression risk,
 and spec gaps (warning, not blocker). See commands/audit.md for full template.
 Manager runs solo or with Reviewer for 10+ file diffs.
+
+---
+
+## 0.5 DEV-TOOLS
+
+Scripts at ~/projects/dev-tools/. Run via bash. All support --json for structured output.
+If script missing or fails: fall back to manual steps in command file. Warn: "dev-tools not found."
+
+| Category | Scripts | Used By |
+|----------|---------|---------|
+| session/ | preflight.sh, status.sh, checkpoint.sh, handoff.sh, lock.sh, morning.sh, recover.sh, crew.sh | /begin, /save, /snap, /status, /morning, /recover, /crew |
+| gates/ | premerge-check.sh, audit-check.sh | /premerge, /audit |
+| testing/ | smart-test-select.sh, test-report.sh | /test, /test-quick, /test-full |
+| scanning/ | proactive-scan.sh, brain-health.sh, kit-validate.sh, health-scan.sh, cleanup.sh | /begin, /health, /cleanup |
+| issues/ | list.sh, triage.sh, feedback.sh | /issues, /triage, /feedback |
+| kit/ | update.sh, version-check.sh, build-bump.sh, pat-rotate.sh | /update, /ship |
+| testflight-sync/ | sync-testflight-feedback.sh | /testflight |
+
+Pattern: script gathers data -> Claude interprets -> Claude acts.
+Scripts never invoke agents, modify source code, or make decisions.
 
 ---
 
@@ -258,6 +272,7 @@ Modules at ~/projects/claude-dev-kit/modules/. Load when needed. Follow module, 
 | testflight.md | TESTFLIGHT_SYNC_SCRIPT in local |
 | audio-pipeline.md | AUDIO_PIPELINE in local |
 | health.md | /health, codebase health audit |
+| communication.md | Shared output formats, decision requests |
 
 State: "Loaded: [module] -- [reason]." Never load all.
 Loading: cat ~/projects/claude-dev-kit/modules/[name].md. If fails, retry once.
@@ -415,6 +430,7 @@ Automation: 0-1: light, solo. 2: 16-L + 17PM-L, auto-fix, Architect. 3: /audit p
 
 Project control panel. Read every session. In .gitignore. Wins over CLAUDE.md.
 Required: APP_NAME, BUNDLE_ID, KIT_REPO. API keys: paste directly.
+GITHUB_PAT: single source of truth. install.sh propagates to .mcp.json, gh CLI, git keychain. (#98)
 Capability keys: opt-in, scripts follow --check/--dry-run/--fix/--help.
 AGENTS: all (default), none, or list.
 Scripts: kit ~/projects/claude-dev-kit/scripts/, project ~/projects/dev-tools/.
@@ -475,6 +491,6 @@ STACK.md tracks tools. At /begin: surface watch items, flag >90 days stale. Appl
 
 ## CHANGELOG
 
-v12.0: Changelog extracted to CHANGELOG.md (installer 25K limit). Version bump from v11.12 — reflects three-gate workflow, enforcement gates, and /audit system added across v11.3–v11.12.
+v13.0: Dev-tools integration — 23 command files wired to ~/projects/dev-tools/ scripts, Section 0.5 DEV-TOOLS reference, CLAUDE.md thinned from ~130 to ~50 procedural lines, install.sh dev-tools validation.
 
 Full changelog: see CHANGELOG.md.

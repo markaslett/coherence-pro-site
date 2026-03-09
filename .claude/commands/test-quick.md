@@ -2,36 +2,32 @@ Quick targeted test. Run only tests matching files changed since last commit.
 Faster than /test (no simulator UI checks) and /test-full (no full matrix).
 Unit tests only, mapped by convention.
 
-## Process
+## Primary (dev-tools available)
 
-1. Get changed files:
-   ```
-   git diff --name-only HEAD
-   ```
-   If no changes (clean tree), use HEAD~1 instead.
+Run: `bash ~/projects/dev-tools/testing/smart-test-select.sh --since-commit --json`
+Read JSON: changed_files, affected_screens, unit_tests, confidence.
 
-2. Filter to .swift source files. Exclude test files, previews, and non-code files.
+If unit_tests is empty: "No test files match the changed sources. Run /test for UI checks or /test-full for the full suite."
 
-3. Map each source file to its test file by convention:
-   - `FooService.swift` → `FooServiceTests.swift`
-   - `FooViewModel.swift` → `FooViewModelTests.swift`
-   - `FooView.swift` → `FooViewTests.swift`
-   - Search the test target directories for matches.
+If unit_tests has entries: build and run via xcodebuild:
+  `xcodebuild test -scheme [scheme] -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:[target] ...`
 
-4. If matching test files found:
-   - Build the test target.
-   - Run only matching tests via xcodebuild:
-     ```
-     xcodebuild test -scheme [scheme] -destination 'platform=iOS Simulator,name=iPhone 16' \
-       -only-testing:[TestTarget]/[TestClass] ...
-     ```
-   - Report pass/fail per test file.
+Report using the output template below.
 
-5. If NO matching test files found:
-   "No test files match the changed sources: [list files].
-   Run /test for UI checks or /test-full for the full suite."
+## Fallback (dev-tools missing)
 
-## Output
+Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
+
+1. Get changed files: `git diff --name-only HEAD` (clean tree: use HEAD~1).
+2. Filter to .swift source files. Exclude test files, previews, non-code.
+3. Map each source to test by convention:
+   - FooService.swift → FooServiceTests.swift
+   - FooViewModel.swift → FooViewModelTests.swift
+   - FooView.swift → FooViewTests.swift
+4. Build test target, run only matching tests via xcodebuild -only-testing.
+5. If no matches: "No test files match. Run /test or /test-full."
+
+## Output Template
 
 ```
 === TEST-QUICK — [YYYY-MM-DD] ===
@@ -47,6 +43,6 @@ RESULT: [ALL PASS / N FAILURES]
 ## Rules
 
 - Never runs simulators for UI testing. Unit tests only.
-- Does not replace /test, /test-full, or /audit. This is for fast feedback during development.
-- If xcodebuild fails to build the test target, report the build error and stop.
-- On FAIL: show the failing test name and assertion message.
+- Does not replace /test, /test-full, or /audit. For fast feedback during development.
+- If xcodebuild fails to build: report build error and stop.
+- On FAIL: show failing test name and assertion message.

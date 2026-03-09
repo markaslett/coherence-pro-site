@@ -3,7 +3,16 @@ Daily product owner briefing. Different from /begin — this is strategic
 
 Run /begin first if not already in a session. Then /morning for the briefing.
 
-## Process
+## Primary (dev-tools available)
+
+Run: `bash ~/projects/dev-tools/session/morning.sh --json`
+Read JSON: overnight_tests, new_feedback, issues_changed, last_session, recommended_priority.
+
+Present results using the Morning Briefing template from communication.md (pattern 7).
+
+## Fallback (dev-tools missing)
+
+Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
 
 1. Read overnight results:
    - docs/brain/TEST-SUMMARY.md (last /test-full results)
@@ -22,7 +31,9 @@ Run /begin first if not already in a session. Then /morning for the briefing.
    - Count by priority (P0, P1, P2, P3)
    - Any new issues since last session
 
-5. Present daily briefing:
+5. Present daily briefing using the Morning Briefing template from communication.md (pattern 7).
+
+## Output Template
 
 ```
 === MORNING BRIEFING — [YYYY-MM-DD] ===

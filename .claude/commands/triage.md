@@ -1,8 +1,10 @@
+<!-- version: 1.0 -->
+
 Batch view of open issues grouped by root cause. Recommends fix order.
 
 ## Primary (dev-tools available)
 
-Run: `bash ~/projects/dev-tools/issues/triage.sh --json`
+Run: `bash ~/projects/claude-dev-tools/issues/triage.sh --json`
 Read JSON: groups (root_cause, issues, recommended_order, fix_estimate),
 ungrouped, recommended_first.
 
@@ -14,7 +16,7 @@ run appropriate crew (1-3 files: solo, 4-10: Specifier->Developer->Tester->Revie
 
 ## Fallback (dev-tools missing)
 
-Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
+Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 
 Load the issues module: cat ~/projects/claude-dev-kit/modules/issues.md
 Load the agents module: cat ~/projects/claude-dev-kit/modules/agents.md

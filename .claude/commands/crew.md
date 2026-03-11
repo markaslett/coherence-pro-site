@@ -1,8 +1,10 @@
+<!-- version: 1.0 -->
+
 Show agent roster status and allow manual invocation of any role.
 
 ## Primary (dev-tools available)
 
-Run: `bash ~/projects/dev-tools/session/crew.sh --json`
+Run: `bash ~/projects/claude-dev-tools/session/crew.sh --json`
 Read JSON: agents array (name, deployed, last_used), total, deployed, missing.
 
 Present results using the Crew Status template from communication.md (pattern 8).
@@ -11,7 +13,7 @@ If Mark says "Run [role]", invoke that agent immediately with current task conte
 
 ## Fallback (dev-tools missing)
 
-Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
+Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 
 Load the agents module: cat ~/projects/claude-dev-kit/modules/agents.md
 State "Loaded: agents.md — running /crew."

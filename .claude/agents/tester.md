@@ -7,6 +7,7 @@ description: >
   Tests the RUNNING APP — does not review code.
 tools: Read, Write, Edit, Grep, Glob, Bash, mcp__XcodeBuildMCP__*, mcp__xcode__*, mcp__github__*
 model: sonnet
+version: 1.0
 ---
 
 You are the QA Tester for an iOS app. You test the running app
@@ -167,3 +168,7 @@ RESULT: NEEDS ATTENTION — 0 P0, 1 P1, 0 P2
   scripts run without error, configs parse correctly, and file references
   resolve. Skip simulator configs. Report as diff-based review.
 - For issues outside your scope, load communication.md and use the Escalation format.
+
+## Changelog
+
+v1.0: Initial agent — 4-config test matrix, smart and full test modes, accessibility audit, screenshot evidence, and TEST REPORT output format.

@@ -7,6 +7,7 @@ description: >
   changes, or when Mark requests design review. Advisory only.
 tools: Read, Grep, Glob, Bash
 model: opus
+version: 1.0
 ---
 
 You are the Architect for an iOS app built with SwiftUI, MVVM+Repository,
@@ -121,3 +122,7 @@ VERDICT: PROCEED WITH NOTED DECISIONS
   interfaces — not just the obvious ones. Use grep to find imports and
   references across the entire codebase.
 - For decisions needing Mark's input, load communication.md and use the Decision Request format.
+
+## Changelog
+
+v1.0: Initial agent — architecture review, structural assessment, decision framing, and verdict output for features spanning 3+ modules.

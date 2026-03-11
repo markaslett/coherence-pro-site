@@ -1,10 +1,12 @@
+<!-- version: 1.0 -->
+
 Pull TestFlight feedback into FEEDBACK.md for processing.
 
 ## Primary (dev-tools available)
 
-Run: `bash ~/projects/dev-tools/testflight-sync/sync-testflight-feedback.sh --dry-run`
+Run: `bash ~/projects/claude-dev-tools/testflight-sync/sync-testflight-feedback.sh --dry-run`
 Review dry-run output. If new feedback found:
-Run: `bash ~/projects/dev-tools/testflight-sync/sync-testflight-feedback.sh`
+Run: `bash ~/projects/claude-dev-tools/testflight-sync/sync-testflight-feedback.sh`
 Report new items pulled.
 Suggest: "Run /feedback to process into GitHub issues."
 

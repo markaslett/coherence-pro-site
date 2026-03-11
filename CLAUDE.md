@@ -1,5 +1,5 @@
-# CLAUDE.md v13.0 -- Development Operating System
-<!-- kit_version: 13.0 -->
+# CLAUDE.md v13.4 -- Development Operating System
+<!-- kit_version: 13.4 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -69,6 +69,8 @@ Mark approves. Claude updates STATUS.md.
 | /update | Pull kit repo + install -- no restart needed |
 | /health | Architect audit mode -- full codebase health check |
 | /morning | Daily briefing -- overnight results, feedback, priorities |
+| /bridge | Slack bridge -- read prompt from channel, execute, post result |
+| /clean | Quality loop -- audit, review, independent review, test until zero issues |
 | /ship | Pre-TestFlight -- bump build, tester summary, approve, commit |
 | /help | Command reference |
 | /help-terminal | Terminal shortcuts, git basics |
@@ -112,9 +114,9 @@ Smart mode: last commit <4h AND clean tree AND same branch -> skip to step 8.
 State: "Quick start (last commit <4h, clean, same branch)."
 
 Full mode:
-1. Run: bash ~/projects/dev-tools/session/preflight.sh --json
+1. Run: bash ~/projects/claude-dev-tools/session/preflight.sh --json
 2. Read JSON output. If lock "locked" (<24h): warn+stop. If "stale": auto-clear via lock.sh release.
-3. Acquire lock: bash ~/projects/dev-tools/session/lock.sh acquire
+3. Acquire lock: bash ~/projects/claude-dev-tools/session/lock.sh acquire
 4. If kit.update_available: run install.sh, tell Mark to /compact.
 5. Surface handoff (start_here at top, waiting + do_not_forget under NEEDS ATTENTION).
 6. Read brain files: STATUS.md first, then by task context.
@@ -125,7 +127,7 @@ Dev-tools missing: fall back to manual steps in commands/begin.md.
 
 ### /status -- Live Snapshot
 
-Run: bash ~/projects/dev-tools/session/status.sh --json (or --compact for LIMITED/MOBILE).
+Run: bash ~/projects/claude-dev-tools/session/status.sh --json (or --compact for LIMITED/MOBILE).
 Dev-tools missing: read STATUS.md, ISSUES.md, TESTS.md, PLAN.md, FEEDBACK.md, CLAUDE.md version, git state manually.
 FULL: PROJECT, REPO, PHASE, BRANCH, INTERFACE, CREW, NEEDS ATTENTION, ISSUES, FEEDBACK, TESTS, LAST SESSION, ACTIVE PLAN, STACK, KIT, RECOMMENDED.
 COMPACT (LIMITED/MOBILE): Project | phase | branch | crew | critical | issues | next.
@@ -148,7 +150,7 @@ Dev-tools missing: fall back to manual steps in commands/save.md.
 
 ### /snap -- Mid-Session
 
-Run: bash ~/projects/dev-tools/session/checkpoint.sh --json (no --commit).
+Run: bash ~/projects/claude-dev-tools/session/checkpoint.sh --json (no --commit).
 Dev-tools missing: scope to changed files, update brain files touched by session diff manually.
 Skip screenshots if no View files in git diff. No commit.
 Auto-snap: after feature/fix, before /test, before branch switch.
@@ -156,7 +158,7 @@ Auto-snap: after feature/fix, before /test, before branch switch.
 
 ### /recover -- Emergency
 
-Run: bash ~/projects/dev-tools/session/recover.sh --json
+Run: bash ~/projects/claude-dev-tools/session/recover.sh --json
 Dev-tools missing: write state to STATUS.md, /snap all brain files manually.
 Try /compact. If not enough: "Context critical. /clear then /begin." Stop.
 
@@ -204,17 +206,21 @@ Manager runs solo or with Reviewer for 10+ file diffs.
 
 ## 0.5 DEV-TOOLS
 
-Scripts at ~/projects/dev-tools/. Run via bash. All support --json for structured output.
+Scripts at ~/projects/claude-dev-tools/. Run via bash. All support --json for structured output.
 If script missing or fails: fall back to manual steps in command file. Warn: "dev-tools not found."
+DEV_TOOLS_MIN_VERSION: 1.0
 
 | Category | Scripts | Used By |
 |----------|---------|---------|
-| session/ | preflight.sh, status.sh, checkpoint.sh, handoff.sh, lock.sh, morning.sh, recover.sh, crew.sh | /begin, /save, /snap, /status, /morning, /recover, /crew |
+| session/ | preflight.sh, status.sh, checkpoint.sh, handoff.sh, lock.sh, morning.sh, recover.sh, crew.sh, debt-score.sh, session-log.sh | /begin, /save, /snap, /status, /morning, /recover, /crew |
 | gates/ | premerge-check.sh, audit-check.sh | /premerge, /audit |
 | testing/ | smart-test-select.sh, test-report.sh | /test, /test-quick, /test-full |
-| scanning/ | proactive-scan.sh, brain-health.sh, kit-validate.sh, health-scan.sh, cleanup.sh | /begin, /health, /cleanup |
-| issues/ | list.sh, triage.sh, feedback.sh | /issues, /triage, /feedback |
-| kit/ | update.sh, version-check.sh, build-bump.sh, pat-rotate.sh | /update, /ship |
+| scanning/ | proactive-scan.sh, brain-health.sh, kit-validate.sh, health-scan.sh, cleanup.sh, convention-check.sh, duplicate-code.sh, import-graph.sh, schema-audit.sh, accessibility-audit.sh, decision-audit.sh, decision-age.sh, regression-guard.sh | /begin, /health, /cleanup, /premerge, /save |
+| git/ | repo-hygiene.sh, pr-summary.sh, commit-audit.sh | /premerge, /health |
+| issues/ | list.sh, triage.sh, feedback.sh, dedup-check.sh, auto-close.sh | /issues, /triage, /feedback, /save, /ship |
+| kit/ | update.sh, version-check.sh, build-bump.sh, pat-rotate.sh, simulator-manager.sh, cross-project.sh, testflight-preflight.sh | /update, /ship, /begin |
+| refactoring/ | split-file.sh, string-audit.sh | Auto-correct (file 250+, string catalog) |
+| audio-pipeline/ | voice-verify.sh, audit-audio.py, verify-text-bridge.py | /test-full, /ship |
 | testflight-sync/ | sync-testflight-feedback.sh | /testflight |
 
 Pattern: script gathers data -> Claude interprets -> Claude acts.
@@ -226,7 +232,8 @@ Scripts never invoke agents, modify source code, or make decisions.
 
 All brain files in docs/brain/: STATUS.md, DECISIONS.md, ISSUES.md,
 CONVENTIONS.md, ARCHITECTURE.md, TESTS.md, TEST-SUMMARY.md,
-TEST-MAP.md, PLAN.md, CREW-LOG.md. Feedback: docs/brain/feedback/FEEDBACK.md.
+TEST-MAP.md, PLAN.md, CREW-LOG.md, REGRESSIONS.md, SESSION-LOG.md,
+LEARNINGS.md, METRICS.md. Feedback: docs/brain/feedback/FEEDBACK.md.
 GitHub is source of truth. YAML frontmatter with provenance fields
 (see brain-templates module). "Never" stale files flagged >14 days.
 
@@ -400,8 +407,9 @@ Before EVERY `git push` command, self-check:
 3. Were the three gates cleared? /audit + /health + /premerge. If no: BLOCK.
 
 This applies to ALL pushes: /save pushes, manual pushes, PR-related pushes.
-The ONLY exception: pushing brain-file-only commits (docs/brain/*) during /save
-when no code was changed — these skip /audit and /premerge but still require /begin.
+Exceptions:
+- Brain-file-only commits (docs/brain/*) during /save when no code was changed — skip /audit and /premerge but still require /begin.
+- Non-app repos (no .xcodeproj, no Package.swift, no package.json) — skip /premerge. These repos have no build/test pipeline. /begin still required.
 
 Do not push without all three gates clear. /test-full exists for ad-hoc use but is not a separate pre-push gate -- /premerge already runs the Tester agent.
 
@@ -432,8 +440,9 @@ Project control panel. Read every session. In .gitignore. Wins over CLAUDE.md.
 Required: APP_NAME, BUNDLE_ID, KIT_REPO. API keys: paste directly.
 GITHUB_PAT: single source of truth. install.sh propagates to .mcp.json, gh CLI, git keychain. (#98)
 Capability keys: opt-in, scripts follow --check/--dry-run/--fix/--help.
+SLACK_CHANNEL_ID: optional, channel ID for /bridge (Slack prompt bridge). Requires Slack MCP.
 AGENTS: all (default), none, or list.
-Scripts: kit ~/projects/claude-dev-kit/scripts/, project ~/projects/dev-tools/.
+Scripts: kit ~/projects/claude-dev-kit/scripts/, project ~/projects/claude-dev-tools/.
 Validation at /begin: paths, keys, agents. Missing: warn, continue.
 
 ---
@@ -491,6 +500,14 @@ STACK.md tracks tools. At /begin: surface watch items, flag >90 days stale. Appl
 
 ## CHANGELOG
 
-v13.0: Dev-tools integration — 23 command files wired to ~/projects/dev-tools/ scripts, Section 0.5 DEV-TOOLS reference, CLAUDE.md thinned from ~130 to ~50 procedural lines, install.sh dev-tools validation.
+v13.4: /bridge command (Slack prompt bridge), /clean command (full quality loop), /premerge updated to use /clean.
+
+v13.3: Knowledge management, quality tracking, iterative review loop, pbxproj safety, version frontmatter.
+
+v13.2: Renamed dev-tools to claude-dev-tools.
+
+v13.1: Richer script interfaces, 48 scripts total.
+
+v13.0: Dev-tools integration, Section 0.5, CLAUDE.md thinned.
 
 Full changelog: see CHANGELOG.md.

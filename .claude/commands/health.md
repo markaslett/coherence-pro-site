@@ -1,3 +1,5 @@
+<!-- version: 1.1 -->
+
 Invoke the Architect in audit mode for a full codebase health check.
 Different from /review (checks a branch diff) — /health checks the entire codebase.
 Different from /audit (checks spec compliance) — /health checks code quality.
@@ -5,21 +7,31 @@ Different from /audit (checks spec compliance) — /health checks code quality.
 ## Primary (dev-tools available)
 
 Step 1: Gather findings
-  `bash ~/projects/dev-tools/scanning/health-scan.sh --json`
-  `bash ~/projects/dev-tools/scanning/proactive-scan.sh --json`
-  Read JSON from both scripts. Merge findings into a single structured report.
+  `bash ~/projects/claude-dev-tools/scanning/health-scan.sh --json`
+  Read JSON: result (healthy/needs_attention/unhealthy), summary,
+  sub_reports: { conventions, duplicates, imports, schema, accessibility, proactive }.
+  Each sub_report has: status, findings[], count, script_used.
+
+  health-scan.sh orchestrates 6 sub-scripts:
+  - convention-check.sh: spacing, hex colors, hardcoded widths, NavigationView, dismiss handling, watchOS font sizes
+  - duplicate-code.sh: exact matches and near-duplicates across Swift files
+  - import-graph.sh: circular dependencies, unused imports, dependency depth
+  - schema-audit.sh: SwiftData model consistency, orphan fields, missing migrations
+  - accessibility-audit.sh: missing labels, contrast issues, tap target sizes
+  - proactive-scan.sh --deep: large files, print(), stale TODOs, missing labels, debug logging, asset colors
 
 Step 2: Invoke Architect subagent
   Load agents module: cat ~/projects/claude-dev-kit/modules/agents.md
   State "Loaded: agents.md — running /health."
-  Pass merged findings to Architect as structured input.
-  Architect interprets findings, checks cross-cutting concerns, produces report.
+  Pass the full JSON (all 6 sub_reports) to Architect as structured input.
+  Architect interprets findings by priority, checks cross-cutting concerns,
+  identifies root causes (one fix may resolve multiple findings).
 
-Step 3: Present results using the AGENT REPORT template (same as current output).
+Step 3: Present results using the AGENT REPORT template (below).
 
 ## Fallback (dev-tools missing)
 
-Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
+Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 
 Load the agents module: cat ~/projects/claude-dev-kit/modules/agents.md
 State "Loaded: agents.md — running /health."
@@ -42,6 +54,7 @@ Scan targets:
 - print() statements in production code (should be Logger)
 - Hardcoded strings that should be in String Catalog
 - Hex colors in Swift that should be in asset catalog
+- Circular dependencies in import graph
 
 Present results using the AGENT REPORT template:
 

@@ -1,51 +1,78 @@
+<!-- version: 1.2 -->
+
 Pre-TestFlight shipping workflow. Bumps build number, generates tester
 summary, gets Mark's approval, commits. Pairs with /testflight (which
 pulls feedback IN — /ship pushes builds OUT).
 
 ## Step 1: Pre-flight checks
 
-Run these checks. Report each as [OK] or [FAIL]. Any FAIL = hard block
-(except tests, which Mark can override).
+### Primary (dev-tools available)
+Run: `bash ~/projects/claude-dev-tools/kit/testflight-preflight.sh --json`
+Read JSON: result (go/no_go), gates[]: { name, status, details }.
 
+testflight-preflight.sh orchestrates 8 gates:
+- build-bump.sh --check: current/next build number, marketing version
+- issues/list.sh --label P0,P1: open blockers
+- voice-verify.sh: manifest/code drift (if AUDIO_PIPELINE active)
+- proactive-scan.sh --deep: large files, print(), stale TODOs, debug logging
+- convention-check.sh: code style violations
+- git status: clean tree check
+- xcodebuild build: build verification
+- xcodebuild test: test pass/fail
+
+Present each gate as [GO] or [NO-GO] with details.
+P0 open = HARD BLOCK. Cannot override.
+Other NO-GO items: Mark can override with "ship anyway".
+
+### Fallback
+Run manual checks:
 1. Branch clean: `git status --porcelain` is empty.
 2. No P0 issues: `gh issue list --label P0 --state open` returns nothing.
-   P0 open = HARD BLOCK. Cannot override.
-3. Build succeeds: use XcodeBuildMCP or `xcodebuild build` on the current
-   scheme. If no Xcode project, skip this check with [SKIP].
-4. Tests pass: use XcodeBuildMCP or `xcodebuild test`. If no test target,
-   [SKIP]. If tests fail, report and ask: "Ship with failing tests? (yes/no)"
+3. Build succeeds: use XcodeBuildMCP or `xcodebuild build`.
+4. Tests pass: use XcodeBuildMCP or `xcodebuild test`.
+Report each as [OK] or [FAIL]. Any FAIL = hard block (except tests, Mark can override).
 
-If any hard block: stop. Print what failed. Do not proceed.
+## Step 1b: Physical device checklist
 
-## Step 2: Read current build number
+Present this checklist to Mark. Each item is manual — Claude cannot verify these.
+Mark confirms each as [OK], [SKIP], or [FAIL]. Any FAIL = block (Mark can override).
+
+```
+PHYSICAL DEVICE CHECKLIST:
+  [ ] App launches on physical iPhone (< 2s)
+  [ ] App launches on physical Apple Watch
+  [ ] Watch HR streaming works during live session
+  [ ] Haptics fire correctly on Watch
+  [ ] Bluetooth pairing/reconnection works
+  [ ] Display-off → resume works on Watch
+  [ ] Schema migration on real data (not empty install)
+  [ ] End-to-end flow: install → pair → session → summary → progress
+  [ ] Memory < 100MB during active session
+  [ ] No crashes in last 24h of TestFlight feedback
+```
+
+If no physical devices available: Mark says "skip device checks" to proceed.
+Items marked [SKIP] appear under KNOWN ISSUES in Step 4.
+
+## Step 2: Bump build number
 
 ### Primary (dev-tools available)
-Run: `bash ~/projects/dev-tools/kit/build-bump.sh --check --json`
-Read JSON: old_build, new_build (preview only — not bumped yet).
-Read marketing version: `agvtool what-marketing-version -terse1`
-If that fails: `grep -r 'MARKETING_VERSION' *.xcodeproj/project.pbxproj | head -1`
-Store: CURRENT_BUILD = old_build, NEW_BUILD = new_build, VERSION.
+Build number and version are already read from testflight-preflight.sh output (gate: build-bump).
+Store: CURRENT_BUILD = gates.build_bump.old_build, NEW_BUILD = gates.build_bump.new_build, VERSION.
+Run: `bash ~/projects/claude-dev-tools/kit/build-bump.sh --json`
+Read JSON: old_build, new_build, bumped. Verify bumped == true.
 
 ### Fallback
 Run: `agvtool what-version -terse` to get current build number.
 If agvtool not configured: `grep -r 'CURRENT_PROJECT_VERSION' *.xcodeproj/project.pbxproj | head -1`
 Store: CURRENT_BUILD, NEW_BUILD = CURRENT_BUILD + 1.
+Run: `agvtool new-version -all $NEW_BUILD`
+If agvtool not configured: update CURRENT_PROJECT_VERSION in project.pbxproj directly.
 Read marketing version: `agvtool what-marketing-version -terse1`
 If that fails: `grep -r 'MARKETING_VERSION' *.xcodeproj/project.pbxproj | head -1`
 Store: VERSION.
 
-## Step 3: Bump build number
-
-### Primary (dev-tools available)
-Run: `bash ~/projects/dev-tools/kit/build-bump.sh --json`
-Read JSON: old_build, new_build, bumped. Verify bumped == true.
-
-### Fallback
-Run: `agvtool new-version -all $NEW_BUILD`
-If agvtool not configured: update CURRENT_PROJECT_VERSION in project.pbxproj directly.
-Verify: `agvtool what-version -terse` returns NEW_BUILD.
-
-## Step 4: Generate "What to Test" summary
+## Step 3: Generate "What to Test" summary
 
 Find the last TestFlight tag: `git tag -l 'testflight/*' --sort=-version:refname | head -1`
 If no previous tag: use the last 20 commits as the range.
@@ -60,7 +87,7 @@ Gather from the range (last tag to HEAD):
 Rewrite each item in plain English for testers (not developers).
 "Fixed crash when..." not "fix(repo): nil guard on optional chain".
 
-## Step 5: Present for approval
+## Step 4: Present for approval
 
 ```
 === SHIP — TestFlight Build ===
@@ -68,27 +95,31 @@ Rewrite each item in plain English for testers (not developers).
 BUILD: v{VERSION} (build {NEW_BUILD})  ← was build {CURRENT_BUILD}
 BRANCH: {current branch}
 
+PRE-FLIGHT:
+  {[GO/NO-GO] for each gate from Step 1}
+
+DEVICE CHECKS:
+  {[OK/SKIP/FAIL] for each item from Step 1b}
+
 WHAT'S NEW (for testers):
   - {plain English description of each change}
   - {one line per item}
 
 KNOWN ISSUES:
   - {open P1/P2, if any}
+  - {skipped device checks, if any}
   {or: None}
-
-PRE-FLIGHT:
-  {[OK/FAIL/SKIP] for each check from Step 1}
 
 Approve, edit, or cancel?
 =============================
 ```
 
 Wait for response:
-- **approve / go / yes**: proceed to Step 6.
+- **approve / go / yes**: proceed to Step 5.
 - **edit**: Mark provides modified summary. Re-present with edits. Wait again.
 - **cancel**: revert build number bump (`agvtool new-version -all $CURRENT_BUILD`), stop.
 
-## Step 6: Commit, tag, push
+## Step 5: Commit, tag, push
 
 1. Stage only build number changes:
    `git add *.xcodeproj/project.pbxproj` (or whatever agvtool modified)

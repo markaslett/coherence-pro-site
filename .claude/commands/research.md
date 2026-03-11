@@ -1,3 +1,5 @@
+<!-- version: 1.0 -->
+
 Invoke the Architect in investigation mode. No plan, no spec — just
 informed analysis on a topic Mark wants to understand.
 

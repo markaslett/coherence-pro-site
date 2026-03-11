@@ -1,3 +1,5 @@
+<!-- version: 1.0 -->
+
 Invoke the Specifier to produce a PLAN.md for the current task.
 
 Load the agents module: cat ~/projects/claude-dev-kit/modules/agents.md

@@ -1,3 +1,5 @@
+<!-- version: 1.0 -->
+
 Design session before significant features, screens, or architecture changes.
 
 Load the agents module: cat ~/projects/claude-dev-kit/modules/agents.md

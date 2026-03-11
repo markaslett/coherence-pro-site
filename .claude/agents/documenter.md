@@ -7,6 +7,7 @@ description: >
   Writes ONLY to docs/brain/.
 tools: Read, Write, Edit, Grep, Glob, Bash
 model: sonnet
+version: 1.0
 ---
 
 You are the Documenter — the tech writer who keeps documentation
@@ -129,3 +130,7 @@ FRONTMATTER:
   files. Check ARCHITECTURE.md module maps, TEST-MAP.md file listings,
   and any file paths mentioned in STATUS.md or PLAN.md.
 - For discrepancies you cannot resolve, load communication.md and use the Escalation format.
+
+## Changelog
+
+v1.0: Initial agent — brain file maintenance, staleness detection, frontmatter updates, and DOCUMENTATION REPORT output format.

@@ -1,19 +1,21 @@
+<!-- version: 1.0 -->
+
 Scan project root for misplaced files and propose reorganization.
 Mark approves before anything moves.
 
 ## Primary (dev-tools available)
 
-Run: `bash ~/projects/dev-tools/scanning/cleanup.sh --json`
+Run: `bash ~/projects/claude-dev-tools/scanning/cleanup.sh --json`
 Read JSON: misplaced array (path, suggested, reason), large_files, total_findings.
 
 If total_findings == 0: "Project root is clean. No action needed."
 
 Present using the CLEANUP REPORT template below.
-Wait for Mark's approval. On approve: `bash ~/projects/dev-tools/scanning/cleanup.sh --fix`
+Wait for Mark's approval. On approve: `bash ~/projects/claude-dev-tools/scanning/cleanup.sh --fix`
 
 ## Fallback (dev-tools missing)
 
-Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
+Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 
 1. Scan project root for clutter:
    - Loose .md files not CLAUDE.md, CLAUDE-local.md, README.md, SESSION-LOCK.md

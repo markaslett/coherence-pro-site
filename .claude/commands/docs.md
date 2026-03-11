@@ -1,3 +1,5 @@
+<!-- version: 1.0 -->
+
 Invoke the Documenter to update brain files.
 
 Load the agents module: cat ~/projects/claude-dev-kit/modules/agents.md

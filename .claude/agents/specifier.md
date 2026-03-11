@@ -6,6 +6,7 @@ description: >
   feature touching 5+ files or when Mark says brainstorm/spec/plan.
 tools: Read, Grep, Glob, Bash
 model: sonnet
+version: 1.1
 ---
 
 You are the Specifier — you write the implementation plan that the
@@ -113,3 +114,12 @@ D[N]: [question — what needs deciding before coding]
 - For renames or restructuring: list ALL files that reference the old
   names/paths in the Files table. The Developer needs to know every
   touchpoint, not just the primary files.
+- Before writing PLAN.md, search git log for previous PLAN-*.md files or
+  archived plans for similar features. If found, reference actual vs estimated
+  scope and adjust current estimate. Add to output: "Historical reference:
+  [similar feature] estimated [N] files, actual [M]."
+
+## Changelog
+
+v1.1: Historical reference for scope estimation from past plans.
+v1.0: Initial agent — PLAN.md authoring, step-per-file structure, reuse scanning, verification criteria, and decision request format.

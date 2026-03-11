@@ -1,3 +1,5 @@
+<!-- version: 1.1 -->
+
 Daily product owner briefing. Different from /begin — this is strategic
 (what happened, what needs attention), not mechanical (lock, validate, sync).
 
@@ -5,14 +7,14 @@ Run /begin first if not already in a session. Then /morning for the briefing.
 
 ## Primary (dev-tools available)
 
-Run: `bash ~/projects/dev-tools/session/morning.sh --json`
+Run: `bash ~/projects/claude-dev-tools/session/morning.sh --json`
 Read JSON: overnight_tests, new_feedback, issues_changed, last_session, recommended_priority.
 
 Present results using the Morning Briefing template from communication.md (pattern 7).
 
 ## Fallback (dev-tools missing)
 
-Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
+Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 
 1. Read overnight results:
    - docs/brain/TEST-SUMMARY.md (last /test-full results)
@@ -65,6 +67,8 @@ RECOMMENDED FIRST ACTION:
 
 ## Rules
 
+- Report debt trend from METRICS.md (docs/brain/METRICS.md) if the file exists.
+  Include in OPEN WORK section: "Debt: [N] points ([+/-M] from last session)."
 - Read-only. /morning never modifies files or starts work.
 - Always include a recommended first action. Be specific.
 - If overnight tests failed: that's the recommendation (fix failures first).

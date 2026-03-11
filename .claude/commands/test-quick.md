@@ -1,10 +1,12 @@
+<!-- version: 1.1 -->
+
 Quick targeted test. Run only tests matching files changed since last commit.
 Faster than /test (no simulator UI checks) and /test-full (no full matrix).
 Unit tests only, mapped by convention.
 
 ## Primary (dev-tools available)
 
-Run: `bash ~/projects/dev-tools/testing/smart-test-select.sh --since-commit --json`
+Run: `bash ~/projects/claude-dev-tools/testing/smart-test-select.sh --since-commit --json`
 Read JSON: changed_files, affected_screens, unit_tests, confidence.
 
 If unit_tests is empty: "No test files match the changed sources. Run /test for UI checks or /test-full for the full suite."
@@ -16,7 +18,7 @@ Report using the output template below.
 
 ## Fallback (dev-tools missing)
 
-Warn: "dev-tools not found at ~/projects/dev-tools/ — running manually."
+Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 
 1. Get changed files: `git diff --name-only HEAD` (clean tree: use HEAD~1).
 2. Filter to .swift source files. Exclude test files, previews, non-code.

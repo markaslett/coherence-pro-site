@@ -1,10 +1,12 @@
+<!-- version: 1.0 -->
+
 Spec compliance audit. Verify code implements what the planning spec says.
 When docs/planning/*.md exists: spec compliance mode.
 No specs: change mode (branch diff audit). No specs AND no changes: fall back to /health.
 
 ## Preamble: Data Gathering (dev-tools available)
 
-Run: `bash ~/projects/dev-tools/gates/audit-check.sh --json`
+Run: `bash ~/projects/claude-dev-tools/gates/audit-check.sh --json`
 Read JSON: mode (spec/change), spec_files, requirements_found, files_in_diff,
 file_to_module_map, test_coverage_map, doc_coverage_map.
 

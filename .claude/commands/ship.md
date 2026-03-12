@@ -89,30 +89,14 @@ Rewrite each item in plain English for testers (not developers).
 
 ## Step 4: Present for approval
 
+Render via box-table.sh. Substitute all placeholders with actual values.
+
+```bash
+echo -e "BUILD | v{VERSION} (build {NEW_BUILD}) -- was build {CURRENT_BUILD}\nBRANCH | {current branch}\n\n## PRE-FLIGHT\n{gate_name} | {GO/NO-GO -- details}\n{gate_name} | {GO/NO-GO -- details}\n...\n\n## DEVICE CHECKS\n{item} | {OK/SKIP/FAIL}\n{item} | {OK/SKIP/FAIL}\n...\n\n## WHAT'S NEW (for testers)\n{plain English description of each change}\n{one line per item}\n\n## KNOWN ISSUES\n{open P1/P2, skipped device checks, or: None}\n\nApprove, edit, or cancel?" \
+  | bash ~/projects/claude-dev-tools/kit/box-table.sh --title "SHIP -- TestFlight Build"
 ```
-=== SHIP — TestFlight Build ===
 
-BUILD: v{VERSION} (build {NEW_BUILD})  ← was build {CURRENT_BUILD}
-BRANCH: {current branch}
-
-PRE-FLIGHT:
-  {[GO/NO-GO] for each gate from Step 1}
-
-DEVICE CHECKS:
-  {[OK/SKIP/FAIL] for each item from Step 1b}
-
-WHAT'S NEW (for testers):
-  - {plain English description of each change}
-  - {one line per item}
-
-KNOWN ISSUES:
-  - {open P1/P2, if any}
-  - {skipped device checks, if any}
-  {or: None}
-
-Approve, edit, or cancel?
-=============================
-```
+If `box-table.sh` is not available, fall back to plain-text `=== ===` format.
 
 Wait for response:
 - **approve / go / yes**: proceed to Step 5.

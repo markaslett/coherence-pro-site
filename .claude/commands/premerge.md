@@ -39,7 +39,9 @@ Step 6: Evaluate full checklist (9 sections from pre-merge.md hook)
   test coverage, documentation, issue reconciliation, branch hygiene, CLAUDE.md size.
 
 Step 7: Present gate result
-  Use PRE-MERGE GATE output template from pre-merge.md.
+  Render via box-table.sh using the template from pre-merge.md Output Format section.
+  Pipe structured input through: bash ~/projects/claude-dev-tools/kit/box-table.sh --title "PRE-MERGE GATE — [branch] -> [target]"
+  If box-table.sh unavailable, fall back to plain-text template.
   Include PR summary (approved by Mark in Step 3).
   GATE: CLEAR or GATE: BLOCKED with each blocking item listed.
 

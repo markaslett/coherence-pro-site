@@ -1,4 +1,4 @@
-<!-- version: 1.1 -->
+<!-- version: 1.2 -->
 
 Quick targeted test. Run only tests matching files changed since last commit.
 Faster than /test (no simulator UI checks) and /test-full (no full matrix).
@@ -48,3 +48,10 @@ RESULT: [ALL PASS / N FAILURES]
 - Does not replace /test, /test-full, or /audit. For fast feedback during development.
 - If xcodebuild fails to build: report build error and stop.
 - On FAIL: show failing test name and assertion message.
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/test-quick","status":"[pass/fail]","emoji":"[:white_check_mark:/:no_entry_sign:]","summary":"[N] unit tests — [N] pass, [N] fail","detail_lines":["[failed test name and assertion if any]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

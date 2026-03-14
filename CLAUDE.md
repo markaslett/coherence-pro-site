@@ -1,5 +1,5 @@
-# CLAUDE.md v13.8 -- Development Operating System
-<!-- kit_version: 13.8 -->
+# CLAUDE.md v13.9 -- Development Operating System
+<!-- kit_version: 13.9 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -194,10 +194,8 @@ DEV_TOOLS_MIN_VERSION: 1.0
 | audio-pipeline/ | voice-verify.sh, audit-audio.py, verify-text-bridge.py | /test-full, /ship |
 | testflight-sync/ | sync-testflight-feedback.sh | /testflight |
 
-Pattern: script gathers data -> Claude interprets -> Claude acts.
-Scripts never invoke agents, modify source code, or make decisions.
-Exit codes: 0 = clean, 1 = findings to report, 2 = missing dependency (warn and continue),
-3 = missing input file (skip silently — expected for repos without certain brain files).
+Pattern: script gathers data -> Claude interprets -> Claude acts. Scripts never invoke agents or modify source.
+Exit codes: 0 = clean, 1 = findings, 2 = missing dep (warn), 3 = missing input (skip silently).
 
 ---
 
@@ -295,9 +293,8 @@ Complexity assessment (MANDATORY -- always present to Mark, always wait for go-a
 - Overnight (/test-full): Tester subagent.
 
 Announce complexity. Mark overrides: "Just build it", "Skip the review", "Solo", "Full crew".
-The complexity switch is NOT optional. If you identify a task as Medium or Complex,
-you MUST dispatch the corresponding agents. Proceeding solo on a Medium or Complex
-task is a workflow violation. If uncertain, default to agents.
+The complexity switch is NOT optional. Medium/Complex MUST dispatch agents.
+Solo on Medium/Complex is a workflow violation. If uncertain, default to agents.
 
 **Complexity self-check (inline, every task):**
 1. Count files that will be touched. State the count.
@@ -385,7 +382,7 @@ Exceptions:
 - Brain-file-only commits (docs/brain/*) during /save when no code was changed — skip /audit and /premerge but still require /begin.
 - Non-app repos (no .xcodeproj, no Package.swift, no package.json) — skip /premerge. These repos have no build/test pipeline. /begin still required.
 
-Do not push without all three gates clear. /test-full exists for ad-hoc use but is not a separate pre-push gate -- /premerge already runs the Tester agent.
+Do not push without all three gates clear. /test-full is ad-hoc, not a gate — /premerge already runs Tester.
 
 ---
 
@@ -400,8 +397,7 @@ Do not push without all three gates clear. /test-full exists for ad-hoc use but 
 | 4: Polish | Audit, accessibility, perf | Full matrix, zero crashes | All three gates: /audit + /health + /premerge. Re-audit until zero MISSING/BROKEN/FAIL. |
 | 5: Ship | TestFlight, App Store | Zero P0/P1 | All three gates required. Physical device testing. |
 
-Principle: each gate catches different things. /audit catches spec violations. /health catches
-codebase hygiene issues. /premerge catches code quality problems and test regressions.
+Each gate catches different things: /audit = spec, /health = hygiene, /premerge = quality + tests.
 Shipping the wrong thing correctly is worse than shipping the right thing with a bug.
 
 Automation: 0-1: light, solo. 2: 16-L + 17PM-L, auto-fix, Architect. 3: /audit per feature, /health before merge, /premerge at phase end, PRs, complexity switch. 4-5: all three gates before every push, mandatory PRs. Load shipping.md.
@@ -414,10 +410,9 @@ Project control panel. Read every session. In .gitignore. Wins over CLAUDE.md.
 Required: APP_NAME, BUNDLE_ID, KIT_REPO. API keys: paste directly.
 GITHUB_PAT: single source of truth. install.sh propagates to .mcp.json, gh CLI, git keychain. (#98)
 Capability keys: opt-in, scripts follow --check/--dry-run/--fix/--help.
-SLACK_CHANNEL_ID: optional, channel ID for /bridge (Slack prompt bridge). Used by bot for channel routing.
-Slack bot: if a Slack bot is running, it polls SLACK_CHANNEL_ID and executes prompts automatically.
-Bot queue controls: reply :x: to cancel a running prompt, :stop_sign: for emergency stop.
-#claude-bridge: direct Anthropic API relay in Slack. Messages go to Claude (Sonnet default, opus: prefix for Opus). Per-thread conversation history. Context built from CLAUDE.md + ISSUES.md + DECISIONS.md across all projects.
+SLACK_CHANNEL_ID: optional, for /bridge. Bot polls channel, executes prompts.
+Bot controls: :x: cancel running prompt, :stop_sign: emergency stop.
+#claude-bridge: Anthropic API relay in Slack (Sonnet default, opus: prefix). Per-thread history. Context from CLAUDE.md + ISSUES.md + DECISIONS.md across projects.
 STATUS.md is read by the bridge relay for live project context. Written by /save and /ship.
 MCP cleanup: disconnect unused MCP servers (Notion, Calendar, Gmail) to save ~34k tokens per session.
 AGENTS: all (default), none, or list.
@@ -468,20 +463,16 @@ Load modules/reference.md for hard-won lessons (build verification, watchOS cons
 
 ## CHANGELOG
 
-v13.8: install.sh restarts Slack bot after dev-tools pull. bridge.md v2.1 (session name derivation, manual /bridge fallback, .overnight-running marker). Integrity check skips CLAUDE.md version match for .kit-skip repos. STATUS.md added to .gitignore (bot-generated).
+v13.9: Bridge emit — all 25 commands write JSONL summaries for bot.
 
-v13.7: Bridge summary file protocol — commands write JSONL summaries to /tmp/claude-bridge-summary-{session}.jsonl, bot reads and posts to Slack. Replaces broken Slack MCP notification approach. Prompt file protocol: bot writes prompt to file, /bridge reads from file. Zero Slack MCP dependency in Claude Code tmux sessions. 15 command/hook files updated.
+v13.8: install.sh restarts bot after pull. bridge.md v2.1. Integrity check skips version match for .kit-skip repos. STATUS.md in .gitignore.
 
-v13.6: Slack bot + bridge relay — #claude-bridge (direct Anthropic API relay, per-thread history, Sonnet/Opus), bot queue controls (:x: cancel, :stop_sign: emergency stop), STATUS.md read by bridge relay for live project context, MCP cleanup recommendation (~34k token savings). CREW-LOG.md brain template added.
+v13.7: Bridge summary file protocol — JSONL to /tmp/, bot reads and posts. Zero Slack MCP dependency in tmux sessions.
 
-v13.5: Capacity recovery — compressed command subsections (procedures live in commands/*.md), moved Section 11 to modules/reference.md. Added Hard Rules table, Iterative Review Loop. Exit code convention in Section 0.5.
+v13.6: Slack bot + bridge relay — #claude-bridge (API relay, per-thread history), bot queue controls, STATUS.md bridge context, MCP cleanup (~34k savings).
 
-v13.4: /bridge command (Slack prompt bridge), /clean command (full quality loop), /premerge updated to use /clean.
+v13.5: Capacity recovery — commands compressed to commands/*.md. Hard Rules table. Exit codes.
 
-v13.3: Knowledge management, quality tracking, iterative review loop, pbxproj safety, version frontmatter.
+v13.4: /bridge, /clean commands. v13.3: Knowledge management, quality tracking. v13.1: 48 scripts. v13.0: Dev-tools integration.
 
-v13.1: Richer script interfaces, 48 scripts total.
-
-v13.0: Dev-tools integration, Section 0.5, CLAUDE.md thinned.
-
-Full changelog: see CHANGELOG.md.
+See CHANGELOG.md for full history.

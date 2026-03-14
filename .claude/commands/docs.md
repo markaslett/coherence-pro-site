@@ -1,4 +1,4 @@
-<!-- version: 1.0 -->
+<!-- version: 1.1 -->
 
 Invoke the Documenter to update brain files.
 
@@ -24,3 +24,10 @@ State "Loaded: agents.md — running /docs."
 - Never creates new brain files without explicit request.
 - Minimum changes — update what's stale, leave the rest.
 - End with: "Brain files current." or "N discrepancies found — see STATUS.md."
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/docs","status":"complete","emoji":":books:","summary":"Brain files updated — [N] files changed","detail_lines":["[list of updated brain files]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

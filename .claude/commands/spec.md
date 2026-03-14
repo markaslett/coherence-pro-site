@@ -1,4 +1,4 @@
-<!-- version: 1.0 -->
+<!-- version: 1.1 -->
 
 Invoke the Specifier to produce a PLAN.md for the current task.
 
@@ -32,3 +32,10 @@ State "Loaded: agents.md — running /spec."
   and Manager can handle solo.
 - On approval: create feature branch, begin BUILD phase.
 - End with: "Approve the plan and start building?"
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/spec","status":"complete","emoji":":triangular_ruler:","summary":"PLAN.md written — [N] files estimated, [SIMPLE/MEDIUM/COMPLEX]","detail_lines":["[key design decision or risk if any]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

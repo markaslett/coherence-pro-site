@@ -1,4 +1,4 @@
-<!-- version: 1.0 -->
+<!-- version: 1.1 -->
 
 Design session before significant features, screens, or architecture changes.
 
@@ -40,3 +40,10 @@ State "Loaded: agents.md — running /brainstorm."
   features skip straight to Specifier.
 - Always use structured output templates from agents.md.
 - End with a clear action: "Approve the plan and start building?"
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/brainstorm","status":"complete","emoji":":bulb:","summary":"Design complete — [N] decisions, PLAN.md ready","detail_lines":["Next: [approve plan and start building / pending Mark approval]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

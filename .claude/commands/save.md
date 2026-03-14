@@ -64,3 +64,10 @@ DO NOT FORGET, CREW ACTIVITY to STATUS.md manually), pre-save hook (Documenter o
 6. git add [files] && git commit -m "..." && git push.
    Scan commits for #NNN, close via GitHub MCP. Update ISSUES.md.
 7. Clear SESSION-LOCK.md. Report: "Saved. [N] files. [hash]. Lock released."
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/save","status":"complete","emoji":":floppy_disk:","summary":"Committed [hash] — [N] files, [N] issues closed, lock released","detail_lines":["[commit message first line]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

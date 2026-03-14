@@ -48,3 +48,10 @@ No automatic fix-and-re-review loop.
 - ALL findings trigger another round. Zero means zero.
 - Round 2+ MUST use fresh Reviewer context (/clear before re-invoke).
 - /premerge always uses iterate mode.
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/review","status":"[PASS/FAIL]","emoji":"[:white_check_mark:/:no_entry_sign:]","summary":"Reviewer: [verdict] — P0:[N] P1:[N] P2:[N], [N] rounds","detail_lines":["[top finding if any]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

@@ -1,5 +1,5 @@
-# CLAUDE.md v13.4 -- Development Operating System
-<!-- kit_version: 13.4 -->
+# CLAUDE.md v13.8 -- Development Operating System
+<!-- kit_version: 13.8 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -26,6 +26,27 @@ These are hard gates. Before taking any action, verify:
 These gates are checked before every tool call, git push, and code suggestion.
 A strong user directive ("read this and start building") does NOT override them.
 Only Mark's explicit phrases override: "skip /begin", "solo", "just build it".
+
+### Hard Rules
+
+| Rule | Trigger | Action |
+|------|---------|--------|
+| Stuck Escalation | Same approach fails 3 times | Stop. Report what failed. Present alternatives. |
+| Complexity Re-assessment | Scope changes mid-task (files grew from 3 to 7) | Re-announce complexity. Invoke agents if now Medium/Complex. |
+| Build Gate | Any Swift/code file saved | Build immediately. Fix silently. Report after 3 failures. |
+| Test After Fix | Bug fix committed | Regression check: test the fix AND neighboring functionality. |
+| Session Readiness | Any work attempted before /begin | BLOCK. Run /begin. No exceptions. |
+| Agent Output Validation | Subagent returns result | Verify output is complete and well-formed before acting on it. |
+| Scope Drift | About to touch file outside current plan | Stop. Report drift. Wait for Mark. |
+| Context-Aware Dispatch | Agent selection for a task | Match agent to actual task needs, not defaults. Solo for simple. |
+
+### Iterative Review Loop
+
+/review and /premerge use iterate mode: review -> fix -> fresh review -> repeat until zero findings.
+Round 2+ MUST clear Reviewer context (prevents familiarity bias from prior round).
+All findings trigger another round — P0, P1, and P2. Zero means zero.
+Hard cap at round 5: escalate to Mark with remaining issues.
+Independent review: fresh context catches what incremental fixes miss.
 
 ---
 
@@ -69,7 +90,7 @@ Mark approves. Claude updates STATUS.md.
 | /update | Pull kit repo + install -- no restart needed |
 | /health | Architect audit mode -- full codebase health check |
 | /morning | Daily briefing -- overnight results, feedback, priorities |
-| /bridge | Slack bridge -- read prompt from channel, execute, post result |
+| /bridge | Slack bridge -- read prompt file, execute, write summary |
 | /clean | Quality loop -- audit, review, independent review, test until zero issues |
 | /ship | Pre-TestFlight -- bump build, tester summary, approve, commit |
 | /help | Command reference |
@@ -125,42 +146,15 @@ Full mode:
 
 Dev-tools missing: fall back to manual steps in commands/begin.md.
 
-### /status -- Live Snapshot
+### /status -- Run status.sh --json (--compact for LIMITED/MOBILE). One recommendation. See commands/status.md.
 
-Run: bash ~/projects/claude-dev-tools/session/status.sh --json (or --compact for LIMITED/MOBILE).
-Dev-tools missing: read STATUS.md, ISSUES.md, TESTS.md, PLAN.md, FEEDBACK.md, CLAUDE.md version, git state manually.
-FULL: PROJECT, REPO, PHASE, BRANCH, INTERFACE, CREW, NEEDS ATTENTION, ISSUES, FEEDBACK, TESTS, LAST SESSION, ACTIVE PLAN, STACK, KIT, RECOMMENDED.
-COMPACT (LIMITED/MOBILE): Project | phase | branch | crew | critical | issues | next.
-P0/P1/Questions/TestFailures/Worktrees/Stale brain: NEEDS ATTENTION.
-One recommendation. Specific, not generic.
+### /summary -- First step of /save. See commands/summary.md.
 
-### /summary -- Session Recap
+### /save -- /summary -> gates -> screenshots -> handoff -> convention check -> commit+push -> unlock. See commands/save.md.
 
-First step of /save. Also on demand. Shows: FEATURES, ISSUES CLOSED, DECISIONS, COMMITS, FILES CHANGED, TESTS, AGENTS USED, STILL OPEN, RECONCILIATION. [!] requires "save anyway" before /save proceeds.
+### /snap -- Run checkpoint.sh --json (no --commit). Auto-snap at 50%/70%/85% context. See commands/snap.md.
 
-### /save -- End Session
-
-1. /summary. 2. Gates: reconciliation [!], FEEDBACK, P0. 3. Screenshots.
-3.5. Pre-save: DECISIONS.md audit, SESSION HANDOFF (via handoff.sh or manual), pre-save hook (Documenter on 5+ files).
-4. Convention/architecture check. 5. Worktree cleanup.
-6. Commit+push via checkpoint.sh (or manual git). Issue auto-close. Lock release.
-7. "Saved. [N] files. [hash]. Lock released."
-
-Dev-tools missing: fall back to manual steps in commands/save.md.
-
-### /snap -- Mid-Session
-
-Run: bash ~/projects/claude-dev-tools/session/checkpoint.sh --json (no --commit).
-Dev-tools missing: scope to changed files, update brain files touched by session diff manually.
-Skip screenshots if no View files in git diff. No commit.
-Auto-snap: after feature/fix, before /test, before branch switch.
-50%: silent. 70%: notify. 85%: warn to finish then /compact or /clear.
-
-### /recover -- Emergency
-
-Run: bash ~/projects/claude-dev-tools/session/recover.sh --json
-Dev-tools missing: write state to STATUS.md, /snap all brain files manually.
-Try /compact. If not enough: "Context critical. /clear then /begin." Stop.
+### /recover -- Run recover.sh --json. Try /compact. If critical: /clear then /begin. See commands/recover.md.
 
 ### Autosave and Self-Audit
 
@@ -171,36 +165,13 @@ Silently verify: STATUS.md current? Decision -> DECISIONS.md immediately.
 Bug -> GitHub issue. Pattern -> CONVENTIONS.md. Architecture -> ARCHITECTURE.md.
 Tests -> TESTS.md. Kit friction -> GitHub KitImprovement.
 
-### /brainstorm -- Design Session
-
-Before significant features, screens, or architecture changes.
-Architect (assessment) + Specifier (PLAN.md) -> Mark approves -> branch -> build.
+### /brainstorm -- Architect + Specifier -> Mark approves -> branch -> build. See commands/brainstorm.md.
 
 ### /audit -- Spec Compliance Gate
 
-Verifies code implements what the planning spec says. Mandatory when docs/planning/*.md exists.
-No specs = runs change mode (branch diff audit). All six agents, four phases for spec mode:
-
-1. **Specifier** — extracts numbered, individually testable requirements (R1, R2...) from specs. This is the checklist.
-2. **Architect + Tester + Documenter** (parallel) — Architect maps requirements to code, Tester maps to tests, Documenter maps to docs. Initial compliance table.
-3. **Developer + Reviewer** (parallel, DONE/PARTIAL only) — Developer traces data flow end-to-end, Reviewer checks implementation quality. Downgrades if broken or unsafe.
-4. **Manager** — merges all reports into final table. Worst status wins.
-
-Gate: zero MISSING + zero BROKEN + zero FAIL = CLEAR. Anything else = fix and re-audit.
-UNTESTED/UNDOCUMENTED surface as warnings but do not block.
-Workflow: Code -> /audit -> fix -> reaudit (repeat until CLEAR) -> /health -> /premerge -> push.
-
-/audit is read-only. It diagnoses, never fixes. The coding instance fixes, then re-runs /audit.
-PARTIAL items are noted but do not block. Only MISSING/BROKEN/FAIL block.
-Audit early, audit often: run /audit after every coding session, not just feature completion.
-Do not wait until all work is done. Catching spec gaps early prevents compounding rework.
-
-### /audit change mode (no specs)
-
-When docs/planning/ is empty or missing, /audit runs change mode — audits the branch
-diff against the base branch for: test coverage, documentation gaps, regression risk,
-and spec gaps (warning, not blocker). See commands/audit.md for full template.
-Manager runs solo or with Reviewer for 10+ file diffs.
+Verifies code implements spec. Gate: zero MISSING/BROKEN/FAIL = CLEAR.
+No specs = change mode (branch diff audit). Read-only — diagnoses, never fixes.
+Audit early, audit often. See commands/audit.md.
 
 ---
 
@@ -225,6 +196,8 @@ DEV_TOOLS_MIN_VERSION: 1.0
 
 Pattern: script gathers data -> Claude interprets -> Claude acts.
 Scripts never invoke agents, modify source code, or make decisions.
+Exit codes: 0 = clean, 1 = findings to report, 2 = missing dependency (warn and continue),
+3 = missing input file (skip silently — expected for repos without certain brain files).
 
 ---
 
@@ -280,6 +253,7 @@ Modules at ~/projects/claude-dev-kit/modules/. Load when needed. Follow module, 
 | audio-pipeline.md | AUDIO_PIPELINE in local |
 | health.md | /health, codebase health audit |
 | communication.md | Shared output formats, decision requests |
+| reference.md | Build verification, watchOS constraints, hard-won lessons |
 
 State: "Loaded: [module] -- [reason]." Never load all.
 Loading: cat ~/projects/claude-dev-kit/modules/[name].md. If fails, retry once.
@@ -440,7 +414,12 @@ Project control panel. Read every session. In .gitignore. Wins over CLAUDE.md.
 Required: APP_NAME, BUNDLE_ID, KIT_REPO. API keys: paste directly.
 GITHUB_PAT: single source of truth. install.sh propagates to .mcp.json, gh CLI, git keychain. (#98)
 Capability keys: opt-in, scripts follow --check/--dry-run/--fix/--help.
-SLACK_CHANNEL_ID: optional, channel ID for /bridge (Slack prompt bridge). Requires Slack MCP.
+SLACK_CHANNEL_ID: optional, channel ID for /bridge (Slack prompt bridge). Used by bot for channel routing.
+Slack bot: if a Slack bot is running, it polls SLACK_CHANNEL_ID and executes prompts automatically.
+Bot queue controls: reply :x: to cancel a running prompt, :stop_sign: for emergency stop.
+#claude-bridge: direct Anthropic API relay in Slack. Messages go to Claude (Sonnet default, opus: prefix for Opus). Per-thread conversation history. Context built from CLAUDE.md + ISSUES.md + DECISIONS.md across all projects.
+STATUS.md is read by the bridge relay for live project context. Written by /save and /ship.
+MCP cleanup: disconnect unused MCP servers (Notion, Calendar, Gmail) to save ~34k tokens per session.
 AGENTS: all (default), none, or list.
 Scripts: kit ~/projects/claude-dev-kit/scripts/, project ~/projects/claude-dev-tools/.
 Validation at /begin: paths, keys, agents. Missing: warn, continue.
@@ -481,30 +460,25 @@ STACK.md tracks tools. At /begin: surface watch items, flag >90 days stale. Appl
 
 ---
 
-## 11. REFERENCE -- HARD-WON LESSONS
+## 11. REFERENCE
 
-### Build Verification
-- Always verify binary UUID changed after code edits before debugging crashes.
-  If UUID is identical across crash logs, DerivedData is stale.
-  Clean build + simulator erase required.
-
-### watchOS Constraints
-- watchOS TabView(.verticalPage) + NavigationStack = crash. Never nest.
-- watchOS Info.plist requires UIApplicationSceneManifest for SwiftUI apps.
-- Apple Watch does NOT expose real-time beat-to-beat RR intervals to third-party apps.
-
-### Trauma-Informed Design
-- Never use red for biometric state indicators in trauma-informed apps.
+Load modules/reference.md for hard-won lessons (build verification, watchOS constraints, trauma-informed design).
 
 ---
 
 ## CHANGELOG
 
+v13.8: install.sh restarts Slack bot after dev-tools pull. bridge.md v2.1 (session name derivation, manual /bridge fallback, .overnight-running marker). Integrity check skips CLAUDE.md version match for .kit-skip repos. STATUS.md added to .gitignore (bot-generated).
+
+v13.7: Bridge summary file protocol — commands write JSONL summaries to /tmp/claude-bridge-summary-{session}.jsonl, bot reads and posts to Slack. Replaces broken Slack MCP notification approach. Prompt file protocol: bot writes prompt to file, /bridge reads from file. Zero Slack MCP dependency in Claude Code tmux sessions. 15 command/hook files updated.
+
+v13.6: Slack bot + bridge relay — #claude-bridge (direct Anthropic API relay, per-thread history, Sonnet/Opus), bot queue controls (:x: cancel, :stop_sign: emergency stop), STATUS.md read by bridge relay for live project context, MCP cleanup recommendation (~34k token savings). CREW-LOG.md brain template added.
+
+v13.5: Capacity recovery — compressed command subsections (procedures live in commands/*.md), moved Section 11 to modules/reference.md. Added Hard Rules table, Iterative Review Loop. Exit code convention in Section 0.5.
+
 v13.4: /bridge command (Slack prompt bridge), /clean command (full quality loop), /premerge updated to use /clean.
 
 v13.3: Knowledge management, quality tracking, iterative review loop, pbxproj safety, version frontmatter.
-
-v13.2: Renamed dev-tools to claude-dev-tools.
 
 v13.1: Richer script interfaces, 48 scripts total.
 

@@ -131,3 +131,10 @@ Wait for response:
 - If no closed issues or PRs found: ask Mark to describe what changed.
 - Tag format: testflight/v{VERSION}-b{BUILD} for easy history.
 - On cancel: always revert the build number bump. Leave no trace.
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/ship","status":"[complete/blocked]","emoji":"[:rocket:/:no_entry_sign:]","summary":"v[VERSION] b[BUILD] — [shipped/blocked: reason]","detail_lines":["[what to test summary]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

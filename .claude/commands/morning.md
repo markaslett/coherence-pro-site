@@ -75,3 +75,10 @@ RECOMMENDED FIRST ACTION:
 - If feedback is waiting: recommend /feedback before building.
 - If nothing urgent: recommend the highest-value open issue.
 - Keep it scannable. Mark reads this on his first cup of coffee.
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/morning","status":"complete","emoji":":sunrise:","summary":"[N] overnight results, [N] feedback items, [N] P0 issues","detail_lines":["Recommended: [first action]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

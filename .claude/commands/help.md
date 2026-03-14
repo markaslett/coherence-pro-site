@@ -26,7 +26,7 @@ Show all kit commands with descriptions.
 | /issues | Work hub — triage and fix issues |
 | /testflight | Pull TestFlight feedback into FEEDBACK.md |
 | /cleanup | Scan root for misplaced files, propose reorganization |
-| /bridge | Slack bridge — read prompt from channel, execute, post result |
+| /bridge | Slack bridge — read prompt file, execute, write summary |
 | /clean | Quality loop — audit, review, independent review, test until zero issues |
 | /ship | Pre-TestFlight — bump build, generate tester summary, approve |
 | /update | Pull kit repo + install — no restart needed |

@@ -24,3 +24,10 @@ Skip smart-test-select.sh. Test the named screen on all 4 configs
 Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 Load testing module: cat ~/projects/claude-dev-kit/modules/testing.md
 Run /test protocol: read git diff, map via TEST-MAP.md, test affected screens on 16-L + 17PM-L.
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/test","status":"[pass/fail]","emoji":"[:white_check_mark:/:no_entry_sign:]","summary":"[N] screens tested — [N] pass, [N] fail across [N] configs","detail_lines":["[failed screen details if any]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

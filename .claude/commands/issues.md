@@ -15,3 +15,10 @@ Present results using the Issue List template from communication.md (pattern 6).
 Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 Load issues module: cat ~/projects/claude-dev-kit/modules/issues.md
 Show issue menu: P0 through Deferred, counts per category.
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/issues","status":"complete","emoji":":clipboard:","summary":"[N] open issues — P0:[N] P1:[N] P2:[N]","detail_lines":[],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

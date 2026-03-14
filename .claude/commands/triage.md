@@ -32,3 +32,10 @@ Present using the Triage Report template from communication.md (pattern 5).
 Each group gets complexity rating (SIMPLE/MEDIUM/COMPLEX).
 SUGGESTED ORDER with reasoning.
 End with "Which group to fix, or discuss priorities?"
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/triage","status":"complete","emoji":":bar_chart:","summary":"[N] issues triaged — [N] groups, recommended first: [issue]","detail_lines":[],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

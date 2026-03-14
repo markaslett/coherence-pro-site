@@ -1,4 +1,4 @@
-<!-- version: 1.1 -->
+<!-- version: 1.2 -->
 
 Start a new session. Run the /begin protocol from CLAUDE.md Section 0.
 
@@ -31,9 +31,11 @@ Start a new session. Run the /begin protocol from CLAUDE.md Section 0.
    - Surface any local_config.warnings from deep validation.
    - Read brain files: STATUS.md first, then by task context.
    - Run: `bash ~/projects/claude-dev-tools/scanning/decision-age.sh --json`
-     If stale decisions found, add to NEEDS ATTENTION: "Decision review due — [N] decisions
+     Exit codes: 0 = clean, 1 = findings to report, 2 = missing dependency (warn and continue),
+     3 = missing input file (skip silently — expected for non-app repos without brain files).
+     If exit 1 (stale decisions found), add to NEEDS ATTENTION: "Decision review due — [N] decisions
      older than 30 days." Mark can say '/research decisions' for Architect review.
-     Fallback if script missing: skip silently.
+     If exit 2: warn and continue. If exit 3 or script missing: skip silently.
    - If git.quick_start_eligible: "Quick start (last commit <4h, clean, same branch)."
 
 5. Present /status format. One recommendation. Specific, not generic.
@@ -59,5 +61,15 @@ Full mode:
 9.5. XcodeBuildMCP defaults: if BUNDLE_ID and SIMULATOR_MAIN_16 set and XcodeBuildMCP available, set session defaults.
 10. Proactive scan: files >250 lines, stale TODOs, print() in production, test gaps, missing .accessibilityLabel, brain rotation, worktree audit.
     Run: `bash ~/projects/claude-dev-tools/scanning/regression-guard.sh --json`
-    If violations found, report as P1 in NEEDS ATTENTION. Fallback if script missing: skip silently.
+    Exit codes: 0 = clean, 1 = findings to report, 2 = missing dependency (warn and continue),
+    3 = missing input file (skip silently — expected for repos without REGRESSIONS.md).
+    If exit 1: report violations as P1 in NEEDS ATTENTION.
+    If exit 2: warn and continue. If exit 3 or script missing: skip silently.
 11. Auto-run /status. One recommendation. Specific, not generic.
+
+## Bridge Summary
+
+If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
+```
+echo '{"protocol_version":1,"command":"/begin","status":"complete","emoji":":white_check_mark:","summary":"[quick start / full mode] — Branch [name], [N] open issues, [N] P0","detail_lines":["[start_here text]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+```

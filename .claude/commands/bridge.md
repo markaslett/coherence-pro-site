@@ -1,4 +1,4 @@
-<!-- version: 2.1 -->
+<!-- version: 2.2 -->
 
 Read and execute a prompt from the bridge prompt file, writing structured summaries for the bot to post.
 
@@ -51,6 +51,12 @@ Fields:
    Commands check: if `BRIDGE_SESSION` is set, append. If not set (manual run), skip.
 
 6. After all work completes, the bot reads the summary file and posts entries to the Slack thread.
+
+7. **LAST STEP — always, no exceptions.** Write the `__done__` sentinel so the bot knows execution finished:
+   ```bash
+   echo '{"protocol_version":1,"command":"__done__","status":"sentinel","emoji":"","summary":"","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+   ```
+   Nothing else runs after this. This MUST be the absolute final bash command.
 
 **Principle:** If Mark reads ONLY the Slack thread, he should know exactly what happened without attaching to tmux.
 

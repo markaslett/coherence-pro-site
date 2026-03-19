@@ -44,6 +44,7 @@ Step 7: Present gate result
   If box-table.sh unavailable, fall back to plain-text template.
   Include PR summary (approved by Mark in Step 3).
   GATE: CLEAR or GATE: BLOCKED with each blocking item listed.
+  If GATE: CLEAR, write merge guard marker: `touch /tmp/kit-premerge-passed-$(git rev-parse HEAD).marker`
 
 ## Fallback (dev-tools missing)
 

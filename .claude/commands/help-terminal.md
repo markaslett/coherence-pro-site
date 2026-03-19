@@ -5,7 +5,12 @@ Terminal shortcuts and basics for Claude Code.
 **Launch options:**
   claude                    Normal session
   claude-test               Overnight (skip permissions)
-  claude --resume            Resume last session
+  claude --continue          Resume most recent session
+  claude --resume            Pick a session to resume
+
+**Keyboard shortcuts:**
+  Esc+Esc                   Open checkpoint picker (rewind / selective compact)
+  /btw [question]           Side question without context cost
 
 **Context management:**
   /compact                  Compress context (try first)

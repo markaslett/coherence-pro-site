@@ -8,7 +8,7 @@ End this session. Run the /save protocol from CLAUDE.md Section 0.
 
 2. Check gates:
    - Reconciliation [!] items from /summary -> require "save anyway" to proceed.
-   - Unprocessed FEEDBACK.md -> warn.
+   - Unprocessed INPUT.md -> warn.
    - Open P0 issues -> warn.
 
 3. Screenshots: if View files in session diff, take before/after.
@@ -57,7 +57,7 @@ End this session. Run the /save protocol from CLAUDE.md Section 0.
 
 Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 
-1. /summary. 2. Gates: reconciliation [!], FEEDBACK, P0. 3. Screenshots.
+1. /summary. 2. Gates: reconciliation [!], INPUT, P0. 3. Screenshots.
 3.5. Pre-save: DECISIONS.md audit, SESSION HANDOFF (write START HERE, WAITING FOR MARK,
 DO NOT FORGET, CREW ACTIVITY to STATUS.md manually), pre-save hook (Documenter on 5+ files).
 4. Convention/architecture check. 5. Worktree cleanup.

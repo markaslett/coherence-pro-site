@@ -11,6 +11,10 @@ Present results using the Recovery Dump template from communication.md (pattern 
 
 Follow recommendation: "compact" -> try /compact. "clear" -> "Context critical. /clear then /begin."
 
+Selective /compact tip: press Esc+Esc to open the checkpoint picker, select a checkpoint
+from before context grew heavy, then /compact. Summarizes from that checkpoint forward
+rather than the full context — often recovers more usable space.
+
 ## Fallback (dev-tools missing)
 
 Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."

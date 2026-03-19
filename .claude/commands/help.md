@@ -22,9 +22,9 @@ Show all kit commands with descriptions.
 | /test [screen] | Targeted — tests one named screen on all 4 configs (16-L, 16-D, 17PM-L, 17PM-D) |
 | /test-quick | Fast — unit tests only, mapped from changed files since last commit |
 | /test-full | Everything — all screens, all 4 configs, VoiceOver, Dynamic Type. Overnight or pre-TestFlight. Zero prompts. |
-| /feedback | Process FEEDBACK.md into GitHub issues (async channel) |
+| /input | Process INPUT.md into GitHub issues (async channel) |
 | /issues | Work hub — triage and fix issues |
-| /testflight | Pull TestFlight feedback into FEEDBACK.md |
+| /testflight | Pull TestFlight feedback into INPUT.md |
 | /cleanup | Scan root for misplaced files, propose reorganization |
 | /bridge | Slack bridge — read prompt file, execute, write summary |
 | /clean | Quality loop — audit, review, independent review, test until zero issues |
@@ -36,7 +36,7 @@ Show all kit commands with descriptions.
 | /help | This reference |
 | /help-terminal | Terminal shortcuts, git basics |
 
-Built-in: /clear, /compact, /context, /mcp, /plugins
+Built-in: /btw, /clear, /color, /compact, /context, /effort, /loop, /mcp, /plugins, /rewind, /simplify, /voice
 
 ## Dev-Tools
 
@@ -50,7 +50,7 @@ If dev-tools is not installed, commands fall back to manual steps automatically.
 | testing/ | smart-test-select.sh, test-report.sh | /test, /test-quick, /test-full |
 | scanning/ | proactive-scan.sh, brain-health.sh, kit-validate.sh, health-scan.sh, cleanup.sh, convention-check.sh, duplicate-code.sh, import-graph.sh, schema-audit.sh, accessibility-audit.sh, decision-audit.sh | /begin, /health, /cleanup, /premerge, /save |
 | git/ | repo-hygiene.sh, pr-summary.sh, commit-audit.sh | /premerge, /health |
-| issues/ | list.sh, triage.sh, feedback.sh, dedup-check.sh, auto-close.sh | /issues, /triage, /feedback, /save, /ship |
+| issues/ | list.sh, triage.sh, feedback.sh, dedup-check.sh, auto-close.sh | /issues, /triage, /input, /save, /ship |
 | kit/ | update.sh, version-check.sh, build-bump.sh, pat-rotate.sh, simulator-manager.sh, cross-project.sh, testflight-preflight.sh | /update, /ship, /begin |
 | refactoring/ | split-file.sh, string-audit.sh | Auto-correct (file 250+, string catalog) |
 | audio-pipeline/ | voice-verify.sh, audit-audio.py, verify-text-bridge.py | /test-full, /ship |

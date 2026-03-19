@@ -30,7 +30,7 @@ in sync with reality. Nobody else does this reliably.
 |------|-----|
 | DECISIONS.md | Written at decision time, never retroactively |
 | ISSUES.md | Synced from GitHub at /begin |
-| FEEDBACK.md | Written by Mark |
+| INPUT.md | Written by Mark |
 
 ## Process
 

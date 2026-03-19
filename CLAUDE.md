@@ -1,5 +1,5 @@
-# CLAUDE.md v13.9 -- Development Operating System
-<!-- kit_version: 13.9 -->
+# CLAUDE.md v14.0 -- Development Operating System
+<!-- kit_version: 14.0 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -82,10 +82,10 @@ Mark approves. Claude updates STATUS.md.
 | /test [screen] | Targeted -- single screen test |
 | /test-quick | Fast -- unit tests only, mapped from changed files since last commit |
 | /test-full | Full suite -- Tester subagent, all screens, all configs, unattended |
-| /feedback | Process FEEDBACK.md -- load issues module |
+| /input | Process INPUT.md -- load issues module |
 | /triage | Batch view -- group issues by root cause, recommend order |
 | /issues | Work hub -- load issues module, show menu |
-| /testflight | Pull TestFlight feedback into FEEDBACK.md |
+| /testflight | Pull TestFlight feedback into INPUT.md |
 | /cleanup | Scan root for misplaced files, propose reorganization |
 | /update | Pull kit repo + install -- no restart needed |
 | /health | Architect audit mode -- full codebase health check |
@@ -95,6 +95,7 @@ Mark approves. Claude updates STATUS.md.
 | /ship | Pre-TestFlight -- bump build, tester summary, approve, commit |
 | /help | Command reference |
 | /help-terminal | Terminal shortcuts, git basics |
+| /btw | Native -- side question without context cost |
 | /clear | Clear context (always /snap first) |
 | /compact | Compress context (try before /clear) |
 | /context | Show context usage |
@@ -152,7 +153,7 @@ Dev-tools missing: fall back to manual steps in commands/begin.md.
 
 ### /save -- /summary -> gates -> screenshots -> handoff -> convention check -> commit+push -> unlock. See commands/save.md.
 
-### /snap -- Run checkpoint.sh --json (no --commit). Auto-snap at 50%/70%/85% context. See commands/snap.md.
+### /snap -- Run checkpoint.sh --json (no --commit). Auto-snap at 50%/70%/85% context and every 2h of elapsed session time. See commands/snap.md.
 
 ### /recover -- Run recover.sh --json. Try /compact. If critical: /clear then /begin. See commands/recover.md.
 
@@ -188,7 +189,7 @@ DEV_TOOLS_MIN_VERSION: 1.0
 | testing/ | smart-test-select.sh, test-report.sh | /test, /test-quick, /test-full |
 | scanning/ | proactive-scan.sh, brain-health.sh, kit-validate.sh, health-scan.sh, cleanup.sh, convention-check.sh, duplicate-code.sh, import-graph.sh, schema-audit.sh, accessibility-audit.sh, decision-audit.sh, decision-age.sh, regression-guard.sh | /begin, /health, /cleanup, /premerge, /save |
 | git/ | repo-hygiene.sh, pr-summary.sh, commit-audit.sh | /premerge, /health |
-| issues/ | list.sh, triage.sh, feedback.sh, dedup-check.sh, auto-close.sh | /issues, /triage, /feedback, /save, /ship |
+| issues/ | list.sh, triage.sh, feedback.sh, dedup-check.sh, auto-close.sh | /issues, /triage, /input, /save, /ship |
 | kit/ | update.sh, version-check.sh, build-bump.sh, pat-rotate.sh, simulator-manager.sh, cross-project.sh, testflight-preflight.sh | /update, /ship, /begin |
 | refactoring/ | split-file.sh, string-audit.sh | Auto-correct (file 250+, string catalog) |
 | audio-pipeline/ | voice-verify.sh, audit-audio.py, verify-text-bridge.py | /test-full, /ship |
@@ -204,12 +205,12 @@ Exit codes: 0 = clean, 1 = findings, 2 = missing dep (warn), 3 = missing input (
 All brain files in docs/brain/: STATUS.md, DECISIONS.md, ISSUES.md,
 CONVENTIONS.md, ARCHITECTURE.md, TESTS.md, TEST-SUMMARY.md,
 TEST-MAP.md, PLAN.md, CREW-LOG.md, REGRESSIONS.md, SESSION-LOG.md,
-LEARNINGS.md, METRICS.md. Feedback: docs/brain/feedback/FEEDBACK.md.
+LEARNINGS.md, METRICS.md. Feedback: docs/brain/input/INPUT.md.
 GitHub is source of truth. YAML frontmatter with provenance fields
 (see brain-templates module). "Never" stale files flagged >14 days.
 
 Hygiene: TESTS.md last 10 runs. screenshots/ prune >2 passes.
-Context: always read STATUS, ISSUES, FEEDBACK. By task: UI->CONVENTIONS,
+Context: always read STATUS, ISSUES, INPUT. By task: UI->CONVENTIONS,
 feature->ARCHITECTURE, bug->TESTS. State what was read.
 CLAUDE-local.md: project config, read every session, wins on conflicts.
 
@@ -242,7 +243,7 @@ Modules at ~/projects/claude-dev-kit/modules/. Load when needed. Follow module, 
 |--------|-----------|
 | agents.md | Complexity switch triggers multi-agent |
 | testing.md | /test, /test-full, any test work |
-| issues.md | /issues, /feedback, issue triage |
+| issues.md | /issues, /input, issue triage |
 | swift-standards.md | First Swift file this session |
 | shipping.md | Phase 4-5, release, pre-flight |
 | tools.md | Tool failure, new tool, MCP issues |
@@ -252,6 +253,7 @@ Modules at ~/projects/claude-dev-kit/modules/. Load when needed. Follow module, 
 | health.md | /health, codebase health audit |
 | communication.md | Shared output formats, decision requests |
 | reference.md | Build verification, watchOS constraints, hard-won lessons |
+| hooks/ | Native Claude Code hook events -- auto-runs at tool use, commit, compact, session events |
 
 State: "Loaded: [module] -- [reason]." Never load all.
 Loading: cat ~/projects/claude-dev-kit/modules/[name].md. If fails, retry once.
@@ -462,6 +464,10 @@ Load modules/reference.md for hard-won lessons (build verification, watchOS cons
 ---
 
 ## CHANGELOG
+
+v14.0: Native hook integration — 9 hooks (notification, swiftformat, pbxproj guard, pre-compact backup, post-compact re-injection, session-start pre-warm, pre-commit quality, merge guard, stop summary). install.sh deploys hook scripts globally and per-project. CLAUDE-manual.md Section 6.5 documents /btw, /rewind, /simplify, /voice, /color, /effort, /loop, --continue, --resume, selective /compact, 1M context, Auto Memory (do not use). Time-based auto-snap (every 2h) added alongside percentage thresholds.
+
+v13.10: Renamed /feedback → /input to avoid collision with Claude Code built-in /feedback command. Renamed docs/brain/feedback/ → docs/brain/input/, FEEDBACK.md → INPUT.md.
 
 v13.9: Bridge emit — all 25 commands write JSONL summaries for bot.
 

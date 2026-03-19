@@ -1,6 +1,6 @@
 <!-- version: 1.1 -->
 
-Pull TestFlight feedback into FEEDBACK.md for processing.
+Pull TestFlight feedback into INPUT.md for processing.
 
 ## Primary (dev-tools available)
 
@@ -8,7 +8,7 @@ Run: `bash ~/projects/claude-dev-tools/testflight-sync/sync-testflight-feedback.
 Review dry-run output. If new feedback found:
 Run: `bash ~/projects/claude-dev-tools/testflight-sync/sync-testflight-feedback.sh`
 Report new items pulled.
-Suggest: "Run /feedback to process into GitHub issues."
+Suggest: "Run /input to process into GitHub issues."
 
 ## Fallback (dev-tools missing)
 

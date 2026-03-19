@@ -21,7 +21,7 @@ Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually.
    - docs/brain/TESTS.md (recent test history)
 
 2. Read feedback pipeline:
-   - docs/brain/feedback/FEEDBACK.md (unprocessed items)
+   - docs/brain/input/INPUT.md (unprocessed items)
    - Count new items since last session
 
 3. Read session handoff:
@@ -52,7 +52,7 @@ OPEN WORK:
   P0: [count]  P1: [count]  P2: [count]  P3: [count]
   New since last session: [list or "none"]
 
-FEEDBACK: [N unprocessed items — run /feedback to triage]
+INPUT: [N unprocessed items — run /input to triage]
   [or: inbox clear]
 
 HANDOFF FROM LAST SESSION:
@@ -72,7 +72,7 @@ RECOMMENDED FIRST ACTION:
 - Read-only. /morning never modifies files or starts work.
 - Always include a recommended first action. Be specific.
 - If overnight tests failed: that's the recommendation (fix failures first).
-- If feedback is waiting: recommend /feedback before building.
+- If feedback is waiting: recommend /input before building.
 - If nothing urgent: recommend the highest-value open issue.
 - Keep it scannable. Mark reads this on his first cup of coffee.
 

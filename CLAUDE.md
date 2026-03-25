@@ -1,5 +1,5 @@
-# CLAUDE.md v14.0 -- Development Operating System
-<!-- kit_version: 14.0 -->
+# CLAUDE.md v14.2 -- Development Operating System
+<!-- kit_version: 14.2 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -464,6 +464,10 @@ Load modules/reference.md for hard-won lessons (build verification, watchOS cons
 ---
 
 ## CHANGELOG
+
+v14.2: Merge guard fixes — (1) /ship commit-message exception: pushes where HEAD message starts with "chore: bump build" or "chore(build):" skip premerge check (deterministic pattern from /ship). (2) Diff bug fix: git diff HEAD~1 changed to git diff HEAD~1 HEAD to exclude dirty working tree files from the pbxproj-only detection.
+
+v14.1: Fix broken hook stdin interface — all 4 project-level hooks now read from stdin instead of non-existent $CLAUDE_TOOL_INPUT env var. Guards functional. Merge guard /ship exception: build-number-only pushes bypass premerge gate.
 
 v14.0: Native hook integration — 9 hooks (notification, swiftformat, pbxproj guard, pre-compact backup, post-compact re-injection, session-start pre-warm, pre-commit quality, merge guard, stop summary). install.sh deploys hook scripts globally and per-project. CLAUDE-manual.md Section 6.5 documents /btw, /rewind, /simplify, /voice, /color, /effort, /loop, --continue, --resume, selective /compact, 1M context, Auto Memory (do not use). Time-based auto-snap (every 2h) added alongside percentage thresholds.
 

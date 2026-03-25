@@ -4,8 +4,9 @@
 # Complementary to /premerge, not a replacement — warns only, does not block.
 # Deployed to .claude/hooks/ in all projects.
 
-# Extract command from tool input
-COMMAND=$(printf '%s\n' "$CLAUDE_TOOL_INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('command',''))" 2>/dev/null)
+# Read tool input from stdin (Claude Code pipes JSON to hooks via stdin)
+INPUT=$(cat)
+COMMAND=$(printf '%s\n' "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_input',{}).get('command',''))" 2>/dev/null)
 
 # Not a git commit — exit immediately
 [[ "$COMMAND" == *"git commit"* ]] || exit 0

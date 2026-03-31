@@ -17,10 +17,3 @@ for new_items with suggested labels. Archive processed entries from INPUT.md.
 Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 Load issues module: cat ~/projects/claude-dev-kit/modules/issues.md
 Read INPUT.md. Classify each item. Create GitHub issues. Archive processed entries.
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
-```
-echo '{"protocol_version":1,"command":"/input","status":"complete","emoji":":inbox_tray:","summary":"[N] items processed — [N] issues filed, [N] duplicates skipped","detail_lines":[],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```

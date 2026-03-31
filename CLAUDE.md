@@ -1,5 +1,5 @@
-# CLAUDE.md v14.2 -- Development Operating System
-<!-- kit_version: 14.2 -->
+# CLAUDE.md v14.3 -- Development Operating System
+<!-- kit_version: 14.3 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -465,24 +465,14 @@ Load modules/reference.md for hard-won lessons (build verification, watchOS cons
 
 ## CHANGELOG
 
+v14.3: Bridge v3.0 cleanup + merge guard non-app exception. Removed per-command JSONL emit blocks from all commands/hooks. Removed kit-notification.sh global hook and Notification settings.json entry. Merge guard now skips premerge for non-app repos (no .xcodeproj/Package.swift/package.json).
+
 v14.2: Merge guard fixes — (1) /ship commit-message exception: pushes where HEAD message starts with "chore: bump build" or "chore(build):" skip premerge check (deterministic pattern from /ship). (2) Diff bug fix: git diff HEAD~1 changed to git diff HEAD~1 HEAD to exclude dirty working tree files from the pbxproj-only detection.
 
 v14.1: Fix broken hook stdin interface — all 4 project-level hooks now read from stdin instead of non-existent $CLAUDE_TOOL_INPUT env var. Guards functional. Merge guard /ship exception: build-number-only pushes bypass premerge gate.
 
-v14.0: Native hook integration — 9 hooks (notification, swiftformat, pbxproj guard, pre-compact backup, post-compact re-injection, session-start pre-warm, pre-commit quality, merge guard, stop summary). install.sh deploys hook scripts globally and per-project. CLAUDE-manual.md Section 6.5 documents /btw, /rewind, /simplify, /voice, /color, /effort, /loop, --continue, --resume, selective /compact, 1M context, Auto Memory (do not use). Time-based auto-snap (every 2h) added alongside percentage thresholds.
+v14.0: Native hook integration — 9 hooks deployed globally and per-project. Time-based auto-snap (every 2h). CLAUDE-manual.md Section 6.5 documents native Claude Code features.
 
-v13.10: Renamed /feedback → /input to avoid collision with Claude Code built-in /feedback command. Renamed docs/brain/feedback/ → docs/brain/input/, FEEDBACK.md → INPUT.md.
-
-v13.9: Bridge emit — all 25 commands write JSONL summaries for bot.
-
-v13.8: install.sh restarts bot after pull. bridge.md v2.1. Integrity check skips version match for .kit-skip repos. STATUS.md in .gitignore.
-
-v13.7: Bridge summary file protocol — JSONL to /tmp/, bot reads and posts. Zero Slack MCP dependency in tmux sessions.
-
-v13.6: Slack bot + bridge relay — #claude-bridge (API relay, per-thread history), bot queue controls, STATUS.md bridge context, MCP cleanup (~34k savings).
-
-v13.5: Capacity recovery — commands compressed to commands/*.md. Hard Rules table. Exit codes.
-
-v13.4: /bridge, /clean commands. v13.3: Knowledge management, quality tracking. v13.1: 48 scripts. v13.0: Dev-tools integration.
+v13.5–v13.10: Bridge protocol, Slack bot relay, capacity recovery, /input rename, commands/*.md compression.
 
 See CHANGELOG.md for full history.

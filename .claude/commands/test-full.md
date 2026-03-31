@@ -44,10 +44,3 @@ Run /test-full protocol: all 4 configs, every screen, VoiceOver, zero prompts.
 Tester writes TEST-SUMMARY.md and TESTS.md directly.
 Voice verification: if AUDIO_PIPELINE active, manually check that all speak() calls
 have matching entries in the voice manifest file.
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
-```
-echo '{"protocol_version":1,"command":"/test-full","status":"[pass/fail]","emoji":"[:white_check_mark:/:no_entry_sign:]","summary":"[N] screens, 4 configs — [N] pass, [N] fail","detail_lines":["[failed screen:config details if any]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```

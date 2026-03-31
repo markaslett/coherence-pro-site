@@ -50,31 +50,3 @@ Global round counter starts at 0. Cap is 5 total across the entire pipeline.
 10. Round 5 cap hit:
     Report: "Capped at round 5: [remaining issues list]."
     Escalate to Mark for decision.
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append progress entries to the summary file
-after each significant milestone. Best-effort — if a write fails, continue execution.
-
-After each review round:
-```
-echo '{"protocol_version":1,"command":"/clean","status":"round","emoji":":mag:","summary":"Round N: P0:X P1:Y P2:Z — [top finding]","detail_lines":[],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```
-
-After commit:
-```
-echo '{"protocol_version":1,"command":"/clean","status":"commit","emoji":":memo:","summary":"Committed [hash]: [message first line]","detail_lines":[],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```
-
-Final result:
-```
-echo '{"protocol_version":1,"command":"/clean","status":"complete","emoji":":white_check_mark:","summary":"N files changed, N issues found/fixed, N review rounds","detail_lines":[],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```
-
-## Rules
-
-- Each agent gets fresh context. No familiarity bias.
-- Round counter is global across all phases — not 5 per agent.
-- If Developer fixes introduce new code, that code goes through the remaining phases.
-- /clean is orchestrated by the Manager. All normal session gates apply.
-- Can be run standalone or as part of /premerge.

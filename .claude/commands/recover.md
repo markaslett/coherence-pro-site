@@ -20,10 +20,3 @@ rather than the full context — often recovers more usable space.
 Warn: "dev-tools not found at ~/projects/claude-dev-tools/ — running manually."
 Write state to STATUS.md. /snap all brain files. Try /compact.
 If not enough: "Context critical. /clear then /begin." Stop.
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
-```
-echo '{"protocol_version":1,"command":"/recover","status":"complete","emoji":":sos:","summary":"State dumped, snap taken — [compact/clear] recommended","detail_lines":["[uncommitted file count if any]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```

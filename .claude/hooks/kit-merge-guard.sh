@@ -13,6 +13,19 @@ if [[ "$COMMAND" != *"git merge"* ]] && [[ "$COMMAND" != *"git push"* ]]; then
     exit 0
 fi
 
+# Non-app repo exception: repos without .xcodeproj, Package.swift, or package.json
+# have no build/test pipeline — skip premerge gate entirely.
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -n "$REPO_ROOT" ]; then
+    HAS_APP=false
+    ls "$REPO_ROOT"/*.xcodeproj 1>/dev/null 2>&1 && HAS_APP=true
+    [ -f "$REPO_ROOT/Package.swift" ] && HAS_APP=true
+    [ -f "$REPO_ROOT/package.json" ] && HAS_APP=true
+    if [ "$HAS_APP" = false ]; then
+        exit 0
+    fi
+fi
+
 # Ship commit-message exception: /ship writes a deterministic commit message.
 # Allow the push without a premerge marker if HEAD is a build-bump commit.
 HEAD_MSG=$(git log -1 --pretty=%s HEAD 2>/dev/null)

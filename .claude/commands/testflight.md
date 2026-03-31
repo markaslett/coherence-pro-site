@@ -15,10 +15,3 @@ Suggest: "Run /input to process into GitHub issues."
 If TESTFLIGHT_SYNC_SCRIPT is set in CLAUDE-local.md: run that script instead.
 If TESTFLIGHT_SYNC_SCRIPT not defined: "TestFlight sync not configured.
 Set TESTFLIGHT_SYNC_SCRIPT in CLAUDE-local.md or install dev-tools."
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
-```
-echo '{"protocol_version":1,"command":"/testflight","status":"complete","emoji":":airplane:","summary":"[N] feedback items pulled — [N] new, [N] duplicates","detail_lines":[],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```

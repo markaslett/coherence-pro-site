@@ -69,10 +69,3 @@ Want to go deeper on any option, or ready to /brainstorm a plan?
 - If the topic is simple enough to answer without the Architect,
   Manager answers directly. No subagent overhead for "what's NSUserDefaults."
 - End with clear next action: deeper research, /brainstorm, or just proceed.
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
-```
-echo '{"protocol_version":1,"command":"/research","status":"complete","emoji":":microscope:","summary":"Analysis complete — [N] options, recommend [A/B/C]","detail_lines":["[recommend rationale, 1 sentence]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```

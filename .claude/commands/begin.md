@@ -66,10 +66,3 @@ Full mode:
     If exit 1: report violations as P1 in NEEDS ATTENTION.
     If exit 2: warn and continue. If exit 3 or script missing: skip silently.
 11. Auto-run /status. One recommendation. Specific, not generic.
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
-```
-echo '{"protocol_version":1,"command":"/begin","status":"complete","emoji":":white_check_mark:","summary":"[quick start / full mode] — Branch [name], [N] open issues, [N] P0","detail_lines":["[start_here text]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```

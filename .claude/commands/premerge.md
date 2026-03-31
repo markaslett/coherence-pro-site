@@ -54,10 +54,3 @@ Run /clean (quality loop runs without dev-tools dependency).
 Manual convention scan via grep/find for print(), missing labels, large files.
 Generate PR summary manually from git log and PLAN.md.
 Gate must clear before any merge to develop or main.
-
-## Bridge Summary
-
-If `BRIDGE_SESSION` is set (running via /bridge), append to summary file:
-```
-echo '{"protocol_version":1,"command":"/premerge","status":"[clear/blocked]","emoji":"[:white_check_mark:/:no_entry_sign:]","summary":"Gate [CLEAR/BLOCKED] — [N] blockers, [N] convention violations","detail_lines":["[blocking item if any]"],"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-```

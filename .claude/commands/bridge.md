@@ -1,30 +1,17 @@
-<!-- version: 2.2 -->
+<!-- version: 3.0 -->
 
-Read and execute a prompt from the bridge prompt file, writing structured summaries for the bot to post.
+Read and execute a prompt from the bridge prompt file.
 
-## Protocol — Bridge Summary File (v1)
+## How It Works
+
+The bot writes a "processing" entry to JSONL at send time. Claude executes the task, then writes
+ONE summary entry + a done sentinel at the end. The bot's JSONL reader posts both to the Slack thread.
 
 Two files coordinate Claude Code ↔ bot communication:
 - **Prompt file** (bot writes, Claude reads): `/tmp/claude-bridge-prompt-{session}.txt`
-- **Summary file** (Claude writes, bot reads): `/tmp/claude-bridge-summary-{session}.jsonl`
+- **Summary file** (bot + Claude write, bot reads): `/tmp/claude-bridge-summary-{session}.jsonl`
 
 The bot owns all Slack API calls. Claude Code never posts to Slack directly.
-
-### JSONL Schema
-
-Each line is a self-contained JSON object:
-```json
-{"protocol_version":1,"command":"/begin","status":"complete","emoji":":white_check_mark:","summary":"Branch main, 2 open issues","detail_lines":["Quick start (clean, same branch)"],"ts":"2026-03-13T10:30:00Z"}
-```
-
-Fields:
-- `protocol_version`: always `1`
-- `command`: the command name — slash-prefixed for commands (e.g., "/begin", "/save"), bare for hooks (e.g., "pre-merge", "pre-save")
-- `status`: result state — common values: "complete", "warning", "error", "blocked". Commands may use domain-specific values: "round", "commit", "pass", "fail", "CLEAR", "BLOCKED", "HEALTHY", "NEEDS ATTENTION", "UNHEALTHY"
-- `emoji`: Slack emoji for the status line
-- `summary`: one-line summary (under 200 chars)
-- `detail_lines`: array of additional detail strings (always present, may be empty `[]`)
-- `ts`: ISO 8601 UTC timestamp
 
 ## Procedure
 
@@ -33,30 +20,22 @@ Fields:
    BRIDGE_SESSION=$(tmux display-message -p '#{session_name}' 2>/dev/null || hostname -s)
    ```
 
-2. Read prompt from file:
-   ```
-   /tmp/claude-bridge-prompt-${BRIDGE_SESSION}.txt
-   ```
+2. Read prompt from file: `/tmp/claude-bridge-prompt-${BRIDGE_SESSION}.txt`
    - File missing: STOP. Report: "No bridge prompt file found."
    - File empty: STOP. Report: "Bridge prompt file is empty."
 
-3. Truncate summary file (clean slate for this invocation):
+3. Execute the prompt content. All normal session gates apply (/begin, complexity check, etc.).
+
+4. **LAST STEP — write summary + done.** After ALL work is finished, write exactly two lines:
    ```bash
-   > /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
+   SUMMARY_FILE="/tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl"
+   echo '{"type":"summary","description":"ONE LINE DESCRIBING WHAT YOU DID","commits":[],"files_changed":0,"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> "$SUMMARY_FILE"
+   echo '{"type":"done","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> "$SUMMARY_FILE"
    ```
-
-4. Execute the prompt content. All normal session gates apply (/begin, complexity check, etc.).
-
-5. Each command that runs during execution appends its own summary entry to the file.
-   Commands check: if `BRIDGE_SESSION` is set, append. If not set (manual run), skip.
-
-6. After all work completes, the bot reads the summary file and posts entries to the Slack thread.
-
-7. **LAST STEP — always, no exceptions.** Write the `__done__` sentinel so the bot knows execution finished:
-   ```bash
-   echo '{"protocol_version":1,"command":"__done__","status":"sentinel","emoji":"","summary":"","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> /tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl
-   ```
-   Nothing else runs after this. This MUST be the absolute final bash command.
+   Replace the description, commits array, and files_changed count with real values.
+   Optional fields: `"tests":"pass/fail counts"`, `"decisions":["D123"]`.
+   **This is the ONLY JSONL you write. The bot handles everything else.**
+   Nothing runs after the done line. This MUST be the absolute final bash command.
 
 **Principle:** If Mark reads ONLY the Slack thread, he should know exactly what happened without attaching to tmux.
 
@@ -101,7 +80,7 @@ reading the prompt directly from the Slack channel (for manual `/bridge` invocat
 4. Read thread to check for existing read receipt (`:hourglass_flowing_sand:` reply).
    - If receipt exists: skip posting. Log "Read receipt already present."
    - If no receipt: post ":hourglass_flowing_sand: Executing..." to thread.
-5. Execute the prompt. Write summary entries to `/tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl` as normal.
+5. Execute the prompt. Write summary + done to `/tmp/claude-bridge-summary-${BRIDGE_SESSION}.jsonl` as in step 4 above.
 6. Post result to thread:
    - Success: ":white_check_mark: Done — [summary]"
    - Failure: ":x: Failed — [error]"

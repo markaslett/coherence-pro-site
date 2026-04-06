@@ -1,5 +1,5 @@
-# CLAUDE.md v14.3 -- Development Operating System
-<!-- kit_version: 14.3 -->
+# CLAUDE.md v14.4 -- Development Operating System
+<!-- kit_version: 14.4 -->
 
 > Claude reads this at session start. Modules loaded on demand.
 > Project config in CLAUDE-local.md. Works everywhere.
@@ -464,6 +464,8 @@ Load modules/reference.md for hard-won lessons (build verification, watchOS cons
 ---
 
 ## CHANGELOG
+
+v14.4: Watch testing in premerge — conditional Watch simulator tests when SIMULATOR_MAIN_WATCH configured. Watch test failure = P1 (blocks merge). Missing config = warn only. testing.md v11.0, pre-merge.md v1.1, tester.md v1.1.
 
 v14.3: Bridge v3.0 cleanup + merge guard non-app exception. Removed per-command JSONL emit blocks from all commands/hooks. Removed kit-notification.sh global hook and Notification settings.json entry. Merge guard now skips premerge for non-app repos (no .xcodeproj/Package.swift/package.json).
 
